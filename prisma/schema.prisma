@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Photo {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  description    String?
+
+  // Дата съёмки (для сортировки в "Последние")
+  shotAt         DateTime
+
+  // Публикация (для SEO-индексации)
+  publishedAt    DateTime?
+  isPublished    Boolean   @default(false)
+
+  // Метаданные файла/отображения
+  s3Key          String    @unique
+  width          Int?
+  height         Int?
+  dominantColor  String?
+
+  // JSON из EXIF (GPS, выдержка и т.д.)
+  exifJson       Json?
+
+  // Одна рубрика у фото (как дефолт; при необходимости расширим до m2m)
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  // Обратная сторона связи Category.coverPhoto
+  coverOfCategories Category[] @relation("CategoryCover")
+
+  // Локация снимка (опционально)
+  locationId     String?
+  location       Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  tags           PhotoTag[]
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([isPublished, shotAt(sort: Desc)])
+  @@index([shotAt(sort: Desc)])
+}
+
+model Category {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  description     String?
+
+  coverPhotoId   String?  @unique
+  coverPhoto      Photo?  @relation("CategoryCover", fields: [coverPhotoId], references: [id], onDelete: SetNull)
+
+  photos          Photo[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+
+  photos    PhotoTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+
+  lat       Float?
+  lng       Float?
+  country   String?
+  city      String?
+
+  photos    Photo[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Явная join-таблица для Photo <-> Tag, чтобы проще было расширять.
+model PhotoTag {
+  photoId String
+  tagId   String
+
+  photo   Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([photoId, tagId])
+  @@index([tagId])
+}

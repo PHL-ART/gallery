@@ -1,0 +1,21 @@
+services:
+  migrate:
+    build: .
+    command: >
+      sh -c "npm run prisma:generate &&
+             npm run prisma:migrate:deploy &&
+             npm run prisma:seed"
+    env_file:
+      - .env
+    restart: "no"
+
+  web:
+    build: .
+    depends_on:
+      - migrate
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+

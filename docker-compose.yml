@@ -8,14 +8,75 @@ services:
     env_file:
       - .env
     restart: "no"
+    networks:
+      - ph1l74-network
 
-  web:
+  ph1l74-gallery:
     build: .
+    container_name: ph1l74-gallery
     depends_on:
       - migrate
-    ports:
-      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
     env_file:
       - .env
     restart: unless-stopped
 
+    networks:
+      - ph1l74-network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"require('http').get('http://localhost:3000/', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\""
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.docker.network=ph1l74-network"
+
+      # HTTP router
+      - "traefik.http.routers.ph1l74-gallery.rule=Host(`photo.ph1l74.com`) || Host(`www.photo.ph1l74.com`)"
+      - "traefik.http.routers.ph1l74-gallery.entrypoints=web"
+      - "traefik.http.routers.ph1l74-gallery.service=ph1l74-gallery"
+
+      # HTTPS router
+      - "traefik.http.routers.ph1l74-gallery-secure.rule=Host(`photo.ph1l74.com`) || Host(`www.photo.ph1l74.com`)"
+      - "traefik.http.routers.ph1l74-gallery-secure.entrypoints=websecure"
+      - "traefik.http.routers.ph1l74-gallery-secure.tls=true"
+      - "traefik.http.routers.ph1l74-gallery-secure.service=ph1l74-gallery"
+      - "traefik.http.routers.ph1l74-gallery-secure.tls.certresolver=letsencrypt"
+
+      # Redirect HTTP -> HTTPS
+      - "traefik.http.middlewares.ph1l74-gallery-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.ph1l74-gallery-redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.ph1l74-gallery.middlewares=ph1l74-gallery-redirect"
+
+      # Application port
+      - "traefik.http.services.ph1l74-gallery.loadbalancer.server.port=3000"
+
+      # Security headers
+      - "traefik.http.middlewares.ph1l74-gallery-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.ph1l74-gallery-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.ph1l74-gallery-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.ph1l74-gallery-headers.headers.stsPreload=true"
+
+      # Redirect www -> apex on HTTPS
+      - "traefik.http.middlewares.ph1l74-gallery-www-redirect.redirectregex.regex=^https://www\\.(.+)"
+      - "traefik.http.middlewares.ph1l74-gallery-www-redirect.redirectregex.replacement=https://$$1"
+      - "traefik.http.middlewares.ph1l74-gallery-www-redirect.redirectregex.permanent=true"
+
+      # Apply middlewares to secure router
+      - "traefik.http.routers.ph1l74-gallery-secure.middlewares=ph1l74-gallery-www-redirect,ph1l74-gallery-headers"
+
+networks:
+  ph1l74-network:
+    external: true

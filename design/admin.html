@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ph1l74 — Admin · Upload</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;700&family=Barlow+Condensed:wght@700;800;900&family=Figtree:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --bg:           oklch(0.10 0.006 25);
+      --surface:      oklch(0.14 0.006 25);
+      --surface-hi:   oklch(0.19 0.006 25);
+      --surface-drop: oklch(0.17 0.008 25);
+      --text:         oklch(0.95 0.006 25);
+      --text-muted:   oklch(0.48 0.006 25);
+      --red:          oklch(0.48 0.20 25);
+      --red-light:    oklch(0.62 0.22 25);
+      --green:        oklch(0.62 0.15 145);
+
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-body:    'Figtree', sans-serif;
+      --font-mono:    'Azeret Mono', monospace;
+
+      --space-xs:   4px;
+      --space-sm:   8px;
+      --space-md:   16px;
+      --space-lg:   24px;
+      --space-xl:   32px;
+      --space-2xl:  48px;
+    }
+
+    [data-theme="light"] {
+      --bg:           oklch(0.97 0.006 25);
+      --surface:      oklch(0.92 0.008 25);
+      --surface-hi:   oklch(0.86 0.008 25);
+      --surface-drop: oklch(0.89 0.010 25);
+      --text:         oklch(0.12 0.006 25);
+      --text-muted:   oklch(0.52 0.006 25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100svh;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* ── LAYOUT ── */
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 100svh;
+    }
+
+    /* ── SIDEBAR ── */
+    .admin-sidebar {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow-y: auto;
+    }
+
+    .admin-brand {
+      padding: var(--space-lg) var(--space-lg) var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .logo .accent { color: var(--red); }
+
+    .admin-badge {
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--red);
+      width: fit-content;
+    }
+
+    .admin-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-md) 0;
+    }
+
+    .nav-group-label {
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      padding: var(--space-md) var(--space-lg) var(--space-sm);
+    }
+
+    .admin-nav a {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      color: var(--text-muted);
+      padding: var(--space-sm) var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      transition: color 0.15s ease, background-color 0.15s ease;
+    }
+    .admin-nav a:hover { color: var(--text); background: var(--surface-hi); }
+    .admin-nav a.active { color: var(--text); background: var(--surface-hi); }
+    .admin-nav a.active .nav-icon { color: var(--red); }
+    .admin-nav a:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; border-radius: 1px; }
+
+    .nav-icon {
+      font-size: 0.9rem;
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .admin-sidebar-footer {
+      padding: var(--space-lg);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── MAIN ── */
+    .admin-main { display: flex; flex-direction: column; min-width: 0; }
+
+    /* ── TOP BAR ── */
+    .admin-topbar {
+      height: 60px;
+      padding: 0 var(--space-xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-md);
+    }
+
+    .topbar-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+
+    .topbar-count {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: var(--space-sm) var(--space-md);
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      text-decoration: none;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .btn:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 1px; }
+
+    .btn-primary { background: var(--red); color: oklch(0.97 0.006 25); }
+    .btn-primary:hover { background: var(--red-light); }
+
+    .btn-secondary { background: var(--surface-hi); color: var(--text-muted); }
+    .btn-secondary:hover { background: var(--text); color: var(--bg); }
+
+    .btn-danger { background: transparent; color: var(--text-muted); }
+    .btn-danger:hover { background: var(--red); color: oklch(0.97 0.006 25); }
+
+    .btn-sm { padding: var(--space-xs) var(--space-sm); font-size: 0.6rem; }
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      padding: var(--space-sm);
+      transition: color 0.15s ease;
+      margin-left: var(--space-md);
+    }
+    .theme-toggle:hover { color: var(--text); }
+    .theme-toggle:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 1px; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: var(--space-md);
+    }
+
+    /* ── UPLOAD SECTION ── */
+    .upload-section {
+      padding: var(--space-xl);
+    }
+
+    .dropzone {
+      background: var(--surface);
+      padding: var(--space-2xl) var(--space-xl);
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .dropzone:hover, .dropzone.drag-over {
+      background: var(--surface-drop);
+    }
+    .dropzone:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 1px; }
+
+    .dropzone-icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-md);
+      color: var(--text-muted);
+    }
+    .dropzone-title {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+    }
+    .dropzone-sub {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+    }
+
+    /* ── UPLOAD QUEUE ── */
+    .upload-queue {
+      margin-top: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .upload-item {
+      background: var(--surface);
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      overflow: hidden;
+    }
+
+    .upload-thumb {
+      background: var(--surface-hi);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .upload-thumb img { width: 56px; height: 56px; object-fit: cover; display: block; }
+    .upload-thumb-empty {
+      width: 56px;
+      height: 56px;
+      background: var(--surface-hi);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .upload-info {
+      padding: var(--space-sm) var(--space-md);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--space-xs);
+      min-width: 0;
+    }
+
+    .upload-filename {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .upload-progress-bar {
+      height: 3px;
+      background: var(--surface-hi);
+      position: relative;
+      overflow: hidden;
+    }
+    .upload-progress-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      transition: width 0.3s ease;
+    }
+
+    .upload-status {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+    }
+
+    .upload-actions {
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-sm);
+      gap: var(--space-xs);
+    }
+
+    /* ── BULK ASSIGN ── */
+    .bulk-assign {
+      margin-top: var(--space-xl);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+    }
+
+    .field-label {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: var(--space-sm);
+    }
+
+    .field-input {
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface);
+      color: var(--text);
+      border: none;
+      outline: none;
+      appearance: none;
+      transition: background-color 0.15s ease;
+    }
+    .field-input:focus { background: var(--surface-hi); outline: 2px solid var(--red); outline-offset: -2px; }
+
+    .field-input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+    }
+    .field-input-row .field-input { width: 100%; }
+    .field-input-row .btn { height: 100%; }
+
+    /* ── PHOTOS TABLE SECTION ── */
+    .photos-section {
+      padding: var(--space-xl);
+      flex: 1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-xl);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+
+    .section-title-count {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-left: var(--space-sm);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      max-width: 280px;
+    }
+
+    /* ── TABLE ── */
+    table { width: 100%; border-collapse: collapse; }
+
+    thead tr { background: var(--surface); }
+
+    th {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+    }
+
+    tbody tr {
+      transition: background-color 0.1s ease;
+    }
+    tbody tr:hover { background: var(--surface); }
+
+    td {
+      padding: var(--space-sm) var(--space-md);
+      vertical-align: middle;
+    }
+
+    .td-thumb {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .td-mono {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .td-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .td-tag {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: var(--surface-hi);
+      color: var(--text-muted);
+      padding: 2px var(--space-sm);
+    }
+
+    .td-actions {
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    /* ── REDUCED MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidebar { display: none; }
+      .admin-topbar { padding: 0 var(--space-md); }
+      .upload-section, .photos-section { padding: var(--space-md); }
+      .bulk-assign { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" aria-label="Admin navigation">
+    <div class="admin-brand">
+      <a class="logo" href="index.html">ph<span class="accent">1</span>l74</a>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <nav class="admin-nav" aria-label="Admin menu">
+      <span class="nav-group-label">Content</span>
+      <a href="#" class="active" aria-current="page">
+        <span class="nav-icon" aria-hidden="true">↑</span> Upload
+      </a>
+      <a href="#">
+        <span class="nav-icon" aria-hidden="true">▦</span> Photos
+      </a>
+      <a href="#">
+        <span class="nav-icon" aria-hidden="true">◫</span> Albums
+      </a>
+      <a href="#">
+        <span class="nav-icon" aria-hidden="true">⊞</span> Tags
+      </a>
+      <span class="nav-group-label">Site</span>
+      <a href="index.html" target="_blank" rel="noopener">
+        <span class="nav-icon" aria-hidden="true">↗</span> View Site
+      </a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      Logged in as<br/>
+      <strong>@ph1l74</strong>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+
+    <div class="admin-topbar">
+      <div class="topbar-left">
+        <span class="topbar-title">Upload</span>
+        <span class="topbar-count">3 queued</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Publish All</button>
+        <button class="theme-toggle" id="themeBtn" aria-label="Toggle color theme">Light</button>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="upload-section">
+      <span class="section-label">Drop zone</span>
+
+      <div class="dropzone" role="button" tabindex="0" aria-label="Drop photos here or click to select files">
+        <div class="dropzone-icon" aria-hidden="true">↑</div>
+        <div class="dropzone-title">Drop photos here or click to select</div>
+        <div class="dropzone-sub">JPEG, RAW · Multiple files supported · Max 50 MB each</div>
+      </div>
+
+      <!-- Upload queue -->
+      <div class="upload-queue" role="list" aria-label="Upload queue">
+
+        <div class="upload-item" role="listitem">
+          <div class="upload-thumb">
+            <img src="https://picsum.photos/seed/u1/56/56" alt="" />
+          </div>
+          <div class="upload-info">
+            <span class="upload-filename">DSC_0421.jpg</span>
+            <div class="upload-progress-bar">
+              <div class="upload-progress-fill" style="width:100%; background:var(--green);"></div>
+            </div>
+            <span class="upload-status">Done · 4.2 MB</span>
+          </div>
+          <div class="upload-actions">
+            <button class="btn btn-secondary btn-sm">Edit</button>
+          </div>
+        </div>
+
+        <div class="upload-item" role="listitem">
+          <div class="upload-thumb">
+            <img src="https://picsum.photos/seed/u2/56/56" alt="" />
+          </div>
+          <div class="upload-info">
+            <span class="upload-filename">DSC_0422.jpg</span>
+            <div class="upload-progress-bar">
+              <div class="upload-progress-fill" style="width:65%; background:var(--red);"></div>
+            </div>
+            <span class="upload-status">Uploading… 65%</span>
+          </div>
+          <div class="upload-actions">
+            <button class="btn btn-danger btn-sm" aria-label="Cancel upload">✕</button>
+          </div>
+        </div>
+
+        <div class="upload-item" role="listitem">
+          <div class="upload-thumb">
+            <div class="upload-thumb-empty" aria-hidden="true">⏳</div>
+          </div>
+          <div class="upload-info">
+            <span class="upload-filename">DSC_0423.jpg</span>
+            <div class="upload-progress-bar"></div>
+            <span class="upload-status">Waiting · 5.8 MB</span>
+          </div>
+          <div class="upload-actions">
+            <button class="btn btn-danger btn-sm" aria-label="Remove from queue">✕</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bulk assign -->
+      <div class="bulk-assign">
+        <div>
+          <label class="field-label" for="albumSelect">Add to album</label>
+          <select class="field-input" id="albumSelect">
+            <option value="">— Select album —</option>
+            <option>Moscow Winter 2023</option>
+            <option>St. Petersburg</option>
+            <option>Night Series</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="tagInput">Add tags</label>
+          <div class="field-input-row">
+            <input class="field-input" id="tagInput" type="text" placeholder="night, street, people…" />
+            <button class="btn btn-primary" aria-label="Add tags">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photos table -->
+    <div class="photos-section">
+      <div class="section-header">
+        <h1 class="section-title">
+          Photos
+          <span class="section-title-count">(128)</span>
+        </h1>
+        <div class="search-row" role="search">
+          <label class="sr-only" for="searchInput">Search photos</label>
+          <input class="field-input" id="searchInput" type="search" placeholder="Search photos…" />
+          <button class="btn btn-secondary">Search</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Photo</th>
+            <th scope="col">Published</th>
+            <th scope="col">Shot</th>
+            <th scope="col">Albums</th>
+            <th scope="col">Tags</th>
+            <th scope="col"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><img class="td-thumb" src="https://picsum.photos/seed/t1/48/48" alt="Photo from 20 Jan 2024" /></td>
+            <td class="td-mono">20.01.2024</td>
+            <td class="td-mono">14.12.2023</td>
+            <td class="td-mono">Moscow Winter 2023</td>
+            <td>
+              <div class="td-tags">
+                <span class="td-tag">Night</span>
+                <span class="td-tag">People</span>
+              </div>
+            </td>
+            <td>
+              <div class="td-actions">
+                <button class="btn btn-secondary btn-sm">Edit</button>
+                <button class="btn btn-secondary btn-sm">Replace</button>
+                <button class="btn btn-danger btn-sm">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><img class="td-thumb" src="https://picsum.photos/seed/t2/48/48" alt="Photo from 19 Jan 2024" /></td>
+            <td class="td-mono">19.01.2024</td>
+            <td class="td-mono">13.12.2023</td>
+            <td class="td-mono">Moscow Winter 2023</td>
+            <td>
+              <div class="td-tags">
+                <span class="td-tag">Snow</span>
+                <span class="td-tag">Architecture</span>
+              </div>
+            </td>
+            <td>
+              <div class="td-actions">
+                <button class="btn btn-secondary btn-sm">Edit</button>
+                <button class="btn btn-secondary btn-sm">Replace</button>
+                <button class="btn btn-danger btn-sm">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><img class="td-thumb" src="https://picsum.photos/seed/t3/48/48" alt="Photo from 18 Jan 2024" /></td>
+            <td class="td-mono">18.01.2024</td>
+            <td class="td-mono">12.12.2023</td>
+            <td class="td-mono">Night Series</td>
+            <td>
+              <div class="td-tags">
+                <span class="td-tag">Metro</span>
+              </div>
+            </td>
+            <td>
+              <div class="td-actions">
+                <button class="btn btn-secondary btn-sm">Edit</button>
+                <button class="btn btn-secondary btn-sm">Replace</button>
+                <button class="btn btn-danger btn-sm">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><img class="td-thumb" src="https://picsum.photos/seed/t4/48/48" alt="Photo from 17 Jan 2024" /></td>
+            <td class="td-mono">17.01.2024</td>
+            <td class="td-mono">11.12.2023</td>
+            <td class="td-mono">St. Petersburg</td>
+            <td>
+              <div class="td-tags">
+                <span class="td-tag">Street</span>
+                <span class="td-tag">People</span>
+                <span class="td-tag">Night</span>
+              </div>
+            </td>
+            <td>
+              <div class="td-actions">
+                <button class="btn btn-secondary btn-sm">Edit</button>
+                <button class="btn btn-secondary btn-sm">Replace</button>
+                <button class="btn btn-danger btn-sm">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<style>
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+</style>
+
+<script>
+  const html = document.documentElement;
+  const btn = document.getElementById('themeBtn');
+  const saved = localStorage.getItem('ph1l74-theme') || 'dark';
+  html.setAttribute('data-theme', saved);
+  btn.textContent = saved === 'dark' ? 'Light' : 'Dark';
+
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('ph1l74-theme', next);
+    btn.textContent = next === 'dark' ? 'Light' : 'Dark';
+  });
+</script>
+
+</body>
+</html>

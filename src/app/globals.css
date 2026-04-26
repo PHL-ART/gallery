@@ -11,6 +11,9 @@
   --text-muted:   oklch(0.48 0.006 25);
   --border-color: oklch(0.22 0.006 25);
 
+  /* Elevated surface — for cards on surface, sidebar sections */
+  --surface-hi: oklch(0.18 0.006 25);
+
   /* Red — surgical accent, use once per screen max */
   --red:          oklch(0.48 0.20 25);
   --red-light:    oklch(0.62 0.22 25);
@@ -38,6 +41,7 @@
   --text:         oklch(0.12 0.006 25);
   --text-muted:   oklch(0.52 0.006 25);
   --border-color: oklch(0.82 0.006 25);
+  --surface-hi:  oklch(0.88 0.008 25);
   /* Red is identical in both themes */
 }
 
@@ -79,6 +83,7 @@ body {
   .bg-canvas    { background-color: var(--bg); }
   .bg-panel     { background-color: var(--surface); }
   .border-subtle { border-color: var(--border-color); }
+  .bg-panel-hi  { background-color: var(--surface-hi); }
 
   /* Interactive states */
   .hover-primary:hover { color: var(--text); }

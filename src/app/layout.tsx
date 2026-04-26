@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, Figtree, Azeret_Mono } from "next/font/google";
-import { Header } from "@/shared/ui/Header";
-import { Footer } from "@/shared/ui/Footer";
+import { StoreProvider } from "@/store/StoreProvider";
 import "./globals.css";
 
 const barlowCondensed = Barlow_Condensed({
@@ -35,7 +34,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Runs before hydration to prevent theme flash
+// Runs synchronously before hydration to prevent theme flash
 const themeScript = `
   try {
     var t = localStorage.getItem('ph1l74-theme') || 'dark';
@@ -43,11 +42,7 @@ const themeScript = `
   } catch(e) {}
 `;
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
@@ -56,13 +51,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
   );

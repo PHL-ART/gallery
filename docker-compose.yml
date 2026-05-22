@@ -1,30 +1,9 @@
 services:
-  db:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   migrate:
     build:
       context: .
       target: migrator
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    env_file: .env
     restart: "no"
 
   app:
@@ -34,16 +13,58 @@ services:
       migrate:
         condition: service_completed_successfully
     env_file: .env
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     ports:
       - "3000:3000"
+    networks:
+      - ph1l74-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"require('http').get('http://localhost:3000/api/healthz', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\""
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ph1l74.rule=Host(`ph1l74.example.com`)"
-      - "traefik.http.routers.ph1l74.entrypoints=websecure"
-      - "traefik.http.routers.ph1l74.tls.certresolver=letsencrypt"
-      - "traefik.http.services.ph1l74.loadbalancer.server.port=3000"
+      - "traefik.docker.network=ph1l74-network"
 
-volumes:
-  pgdata:
+      # HTTP router
+      - "traefik.http.routers.ph1l74-gallery.rule=Host(`photo.ph1l74.com`) || Host(`www.photo.ph1l74.com`)"
+      - "traefik.http.routers.ph1l74-gallery.entrypoints=web"
+      - "traefik.http.routers.ph1l74-gallery.service=ph1l74-gallery"
+
+      # HTTPS router
+      - "traefik.http.routers.ph1l74-gallery-secure.rule=Host(`photo.ph1l74.com`) || Host(`www.photo.ph1l74.com`)"
+      - "traefik.http.routers.ph1l74-gallery-secure.entrypoints=websecure"
+      - "traefik.http.routers.ph1l74-gallery-secure.tls=true"
+      - "traefik.http.routers.ph1l74-gallery-secure.service=ph1l74-gallery"
+      - "traefik.http.routers.ph1l74-gallery-secure.tls.certresolver=letsencrypt"
+
+      # Redirect HTTP -> HTTPS
+      - "traefik.http.middlewares.ph1l74-gallery-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.ph1l74-gallery-redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.ph1l74-gallery.middlewares=ph1l74-gallery-redirect"
+
+      # Application port
+      - "traefik.http.services.ph1l74-gallery.loadbalancer.server.port=3000"
+
+      # Security headers
+      - "traefik.http.middlewares.ph1l74-gallery-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.ph1l74-gallery-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.ph1l74-gallery-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.ph1l74-gallery-headers.headers.stsPreload=true"
+
+      # Redirect www -> apex on HTTPS
+      - "traefik.http.middlewares.ph1l74-gallery-www-redirect.redirectregex.regex=^https://www\\.(.+)"
+      - "traefik.http.middlewares.ph1l74-gallery-www-redirect.redirectregex.replacement=https://$$1"
+      - "traefik.http.middlewares.ph1l74-gallery-www-redirect.redirectregex.permanent=true"
+
+      # Apply middlewares to secure router
+      - "traefik.http.routers.ph1l74-gallery-secure.middlewares=ph1l74-gallery-www-redirect,ph1l74-gallery-headers"
+
+networks:
+  ph1l74-network:
+    external: true

@@ -10,8 +10,11 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ profile }) {
-      // Only the owner's GitHub account may sign in
-      return String((profile as { id?: number })?.id) === process.env.ADMIN_GITHUB_ID;
+      const allowlist = (process.env.ADMIN_ALLOWLIST ?? "")
+        .split(",")
+        .map((e) => e.trim().toLowerCase());
+      const email = (profile as { email?: string })?.email?.toLowerCase() ?? "";
+      return allowlist.includes(email);
     },
   },
   pages: {

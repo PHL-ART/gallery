@@ -25,7 +25,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY prisma ./prisma
 COPY package.json ./
 RUN npx prisma generate
-CMD ["npx", "prisma", "db", "push", "--skip-generate"]
+CMD ["npx", "prisma", "migrate", "deploy"]
 
 # ── Runner ────────────────────────────────────────────────────────────────────
 FROM base AS runner

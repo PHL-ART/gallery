@@ -1,16 +1,16 @@
 services:
-  migrate:
+  ph1l74-photo-migrate:
     build:
       context: .
       target: migrator
     env_file: .env
     restart: "no"
 
-  app:
+  ph1l74-photo-app:
     build: .
     restart: unless-stopped
     depends_on:
-      migrate:
+      ph1l74-photo-migrate:
         condition: service_completed_successfully
     env_file: .env
     ports:

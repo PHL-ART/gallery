@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       Bucket: S3_BUCKET,
       Key: s3Key,
       ContentType: contentType,
+      ACL: "public-read",
     });
 
     const uploadUrl = await getSignedUrl(getS3Client(), command, { expiresIn: 3600 });

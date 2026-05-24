@@ -13,8 +13,10 @@ export const authOptions: NextAuthOptions = {
       const allowlist = (process.env.ADMIN_ALLOWLIST ?? "")
         .split(",")
         .map((e) => e.trim().toLowerCase());
-      const email = (profile as { email?: string })?.email?.toLowerCase() ?? "";
-      return allowlist.includes(email);
+      const p = profile as { email?: string; login?: string };
+      const email = p?.email?.toLowerCase() ?? "";
+      const login = p?.login?.toLowerCase() ?? "";
+      return allowlist.includes(email) || allowlist.includes(login);
     },
   },
   pages: {

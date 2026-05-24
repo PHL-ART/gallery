@@ -8,12 +8,42 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const albumId = searchParams.get("albumId");
     const tagId = searchParams.get("tagId");
+    const notInAlbumId = searchParams.get("notInAlbumId");
+    const notInTagId = searchParams.get("notInTagId");
+    const skip = parseInt(searchParams.get("skip") ?? "0", 10);
+    const take = Math.min(parseInt(searchParams.get("take") ?? "24", 10), 50);
 
+    const isPaginated = !!(notInAlbumId || notInTagId);
+
+    const where = {
+      ...(albumId ? { albums: { some: { albumId } } } : {}),
+      ...(tagId ? { tags: { some: { tagId } } } : {}),
+      ...(notInAlbumId ? { albums: { none: { albumId: notInAlbumId } } } : {}),
+      ...(notInTagId ? { tags: { none: { tagId: notInTagId } } } : {}),
+    };
+
+    if (isPaginated) {
+      const [photos, total] = await prisma.$transaction([
+        prisma.photo.findMany({
+          where,
+          select: { id: true, s3Key: true },
+          orderBy: { publishedAt: "desc" },
+          skip,
+          take,
+        }),
+        prisma.photo.count({ where }),
+      ]);
+
+      const { getPhotoUrl } = await import("@/shared/utils/getPhotoUrl");
+      return NextResponse.json({
+        photos: photos.map((p) => ({ id: p.id, url: getPhotoUrl(p.s3Key) })),
+        total,
+      });
+    }
+
+    // Existing behaviour — returns raw array, unchanged
     const photos = await prisma.photo.findMany({
-      where: {
-        ...(albumId ? { albums: { some: { albumId } } } : {}),
-        ...(tagId ? { tags: { some: { tagId } } } : {}),
-      },
+      where,
       include: {
         tags: { include: { tag: true } },
         albums: { include: { album: true } },

@@ -36,20 +36,37 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const { name, title, description, isSpecial } = await req.json();
+    const { name, title, description, isSpecial, photoIds } = await req.json();
 
-    const album = await prisma.album.update({
-      where: { id: params.id },
-      data: {
-        ...(name !== undefined ? { name } : {}),
-        ...(title !== undefined ? { title } : {}),
-        ...(description !== undefined ? { description } : {}),
-        ...(isSpecial !== undefined ? { isSpecial } : {}),
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const album = await tx.album.update({
+        where: { id: params.id },
+        data: {
+          ...(name !== undefined ? { name } : {}),
+          ...(title !== undefined ? { title } : {}),
+          ...(description !== undefined ? { description } : {}),
+          ...(isSpecial !== undefined ? { isSpecial } : {}),
+        },
+      });
+
+      if (Array.isArray(photoIds)) {
+        await tx.photoAlbum.deleteMany({ where: { albumId: params.id } });
+        if (photoIds.length > 0) {
+          await tx.photoAlbum.createMany({
+            data: (photoIds as string[]).map((photoId) => ({
+              photoId,
+              albumId: params.id,
+            })),
+          });
+        }
+      }
+
+      return album;
     });
 
-    return NextResponse.json(album);
-  } catch {
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error("[PUT /api/albums/[id]]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

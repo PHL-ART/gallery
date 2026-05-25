@@ -10,8 +10,8 @@ export async function GET(req: NextRequest) {
     const tagId = searchParams.get("tagId");
     const notInAlbumId = searchParams.get("notInAlbumId");
     const notInTagId = searchParams.get("notInTagId");
-    const skip = parseInt(searchParams.get("skip") ?? "0", 10);
-    const take = Math.min(parseInt(searchParams.get("take") ?? "24", 10), 50);
+    const skip = Math.max(0, parseInt(searchParams.get("skip") ?? "0", 10) || 0);
+    const take = Math.max(1, Math.min(parseInt(searchParams.get("take") ?? "24", 10) || 24, 50));
 
     const isPaginated = !!(notInAlbumId || notInTagId);
 
@@ -52,7 +52,8 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(photos);
-  } catch {
+  } catch (err) {
+    console.error("[GET /api/photos]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

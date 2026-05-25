@@ -44,6 +44,7 @@ export default async function AdminAlbumEditPage({ params }: Props) {
           description: album.description ?? "",
           isSpecial: album.isSpecial,
         }}
+        photos={[]}
       />
 
       <div className="mt-10 pt-6" style={{ borderTop: "1px solid var(--surface-hi)" }}>

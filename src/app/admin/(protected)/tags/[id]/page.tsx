@@ -39,6 +39,7 @@ export default async function AdminTagEditPage({ params }: Props) {
 
       <AdminTagEditForm
         tag={{ id: tag.id, title: tag.title, description: tag.description ?? "" }}
+        photos={[]}
       />
 
       <div className="mt-10 pt-6" style={{ borderTop: "1px solid var(--surface-hi)" }}>

@@ -1,24 +1,82 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { PhotoManager, PhotoThumb } from "./PhotoManager";
 
 interface Props {
   tag: { id: string; title: string; description: string };
+  photos: PhotoThumb[];
 }
 
-export function AdminTagEditForm({ tag }: Props) {
+const PAGE_SIZE = 24;
+
+export function AdminTagEditForm({ tag, photos: initialPhotos }: Props) {
   const router = useRouter();
+
   const [title, setTitle] = useState(tag.title);
   const [description, setDescription] = useState(tag.description);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const [inPhotos, setInPhotos] = useState<PhotoThumb[]>(initialPhotos);
+  const [notInPhotos, setNotInPhotos] = useState<PhotoThumb[]>([]);
+  const [skip, setSkip] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const originalIds = useMemo(
+    () => new Set(initialPhotos.map((p) => p.id)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const fetchNotIn = useCallback(
+    async (currentSkip: number, currentInPhotos: PhotoThumb[]) => {
+      setLoadingMore(true);
+      const res = await fetch(
+        `/api/photos?notInTagId=${tag.id}&skip=${currentSkip}&take=${PAGE_SIZE}`
+      );
+      const data: { photos: PhotoThumb[]; total: number } = await res.json();
+      const inIds = new Set(currentInPhotos.map((p) => p.id));
+      const fresh = data.photos.filter((p) => !inIds.has(p.id));
+      setNotInPhotos((prev) => (currentSkip === 0 ? fresh : [...prev, ...fresh]));
+      setHasMore(currentSkip + PAGE_SIZE < data.total);
+      setLoadingMore(false);
+    },
+    [tag.id]
+  );
+
+  useEffect(() => {
+    fetchNotIn(0, inPhotos);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleClickIn(photo: PhotoThumb) {
+    setInPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+    setNotInPhotos((prev) => [photo, ...prev]);
+  }
+
+  function handleClickNotIn(photo: PhotoThumb) {
+    setNotInPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+    setInPhotos((prev) => [photo, ...prev]);
+  }
+
+  async function handleLoadMore() {
+    const nextSkip = skip + PAGE_SIZE;
+    setSkip(nextSkip);
+    await fetchNotIn(nextSkip, inPhotos);
+  }
 
   async function handleSave() {
     setSaving(true);
     await fetch(`/api/tags/${tag.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description: description || undefined }),
+      body: JSON.stringify({
+        title,
+        description: description || undefined,
+        photoIds: inPhotos.map((p) => p.id),
+      }),
     });
     setSaving(false);
     setSaved(true);
@@ -63,6 +121,18 @@ export function AdminTagEditForm({ tag }: Props) {
       >
         {saving ? "Saving…" : saved ? "✓ Saved" : "Save changes"}
       </button>
+
+      <PhotoManager
+        inPhotos={inPhotos}
+        notInPhotos={notInPhotos}
+        originalIds={originalIds}
+        hasMore={hasMore}
+        loadingMore={loadingMore}
+        inLabel="in tag"
+        onClickIn={handleClickIn}
+        onClickNotIn={handleClickNotIn}
+        onLoadMore={handleLoadMore}
+      />
     </div>
   );
 }

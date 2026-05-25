@@ -32,19 +32,36 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const { name, title, description } = await req.json();
+    const { name, title, description, photoIds } = await req.json();
 
-    const tag = await prisma.tag.update({
-      where: { id: params.id },
-      data: {
-        ...(name !== undefined ? { name } : {}),
-        ...(title !== undefined ? { title } : {}),
-        ...(description !== undefined ? { description } : {}),
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const tag = await tx.tag.update({
+        where: { id: params.id },
+        data: {
+          ...(name !== undefined ? { name } : {}),
+          ...(title !== undefined ? { title } : {}),
+          ...(description !== undefined ? { description } : {}),
+        },
+      });
+
+      if (Array.isArray(photoIds)) {
+        await tx.photoTag.deleteMany({ where: { tagId: params.id } });
+        if (photoIds.length > 0) {
+          await tx.photoTag.createMany({
+            data: (photoIds as string[]).map((photoId) => ({
+              photoId,
+              tagId: params.id,
+            })),
+          });
+        }
+      }
+
+      return tag;
     });
 
-    return NextResponse.json(tag);
-  } catch {
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error("[PUT /api/tags/[id]]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

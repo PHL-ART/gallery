@@ -6,9 +6,10 @@ import "leaflet/dist/leaflet.css";
 interface Props {
   lat: number;
   lon: number;
+  theme: "dark" | "light";
 }
 
-export function LocationMapInner({ lat, lon }: Props) {
+export function LocationMapInner({ lat, lon, theme }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
 
@@ -27,14 +28,19 @@ export function LocationMapInner({ lat, lon }: Props) {
       attributionControl: false,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 19,
-      subdomains: "abcd",
-    }).addTo(map);
+    const tileUrl =
+      theme === "dark"
+        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 
-    // Square brutalist marker — visible on dark monochrome tiles
+    L.tileLayer(tileUrl, { maxZoom: 19, subdomains: "abcd" }).addTo(map);
+
+    const markerBg = theme === "dark" ? "#fff" : "oklch(0.48 0.20 25)";
+    const markerOutline =
+      theme === "dark" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.18)";
+
     const icon = L.divIcon({
-      html: `<div style="width:8px;height:8px;background:#fff;outline:2px solid rgba(255,255,255,0.25)"></div>`,
+      html: `<div style="width:8px;height:8px;background:${markerBg};outline:2px solid ${markerOutline}"></div>`,
       className: "",
       iconSize: [8, 8],
       iconAnchor: [4, 4],
@@ -47,7 +53,12 @@ export function LocationMapInner({ lat, lon }: Props) {
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [lat, lon]);
+  }, [lat, lon, theme]);
+
+  const filter =
+    theme === "dark"
+      ? "grayscale(1) brightness(0.75) contrast(1.15)"
+      : "grayscale(0.3) brightness(1.0) contrast(1.05)";
 
   return (
     <a
@@ -59,7 +70,7 @@ export function LocationMapInner({ lat, lon }: Props) {
     >
       <div
         ref={containerRef}
-        style={{ height: 160, filter: "grayscale(1) brightness(0.75) contrast(1.15)" }}
+        style={{ height: 160, filter }}
         className="w-full pointer-events-none"
       />
     </a>

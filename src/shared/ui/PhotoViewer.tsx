@@ -14,11 +14,19 @@ interface Props {
 
 export function PhotoViewer({ src, prevHref, nextHref }: Props) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
   const router = useRouter();
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    setZoom(1);
+    setZoomOrigin({ x: 50, y: 50 });
+  };
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowLeft" && prevHref) router.push(prevHref);
       if (e.key === "ArrowRight" && nextHref) router.push(nextHref);
     };
@@ -26,11 +34,22 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
     return () => window.removeEventListener("keydown", handler);
   }, [prevHref, nextHref, router]);
 
+  const handleLightboxClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (zoom === 1) {
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setZoomOrigin({ x, y });
+      setZoom(2.5);
+    } else {
+      setZoom(1);
+      setZoomOrigin({ x: 50, y: 50 });
+    }
+  };
+
   return (
-    <div
-      className="relative flex items-center justify-center min-h-[calc(100svh-120px)] max-[900px]:min-h-[70vw] max-md:min-h-[calc(100svh-104px)] bg-canvas"
-    >
-      {/* Zoomable image */}
+    <div className="relative flex items-center justify-center min-h-[calc(100svh-120px)] max-[900px]:min-h-[70vw] max-md:min-h-[calc(100svh-104px)] bg-canvas">
+      {/* Zoomable thumbnail */}
       <motion.div
         className="relative w-full h-full min-h-[calc(100svh-120px)] max-[900px]:min-h-[70vw] max-md:min-h-[calc(100svh-104px)]"
         style={{ cursor: "zoom-in" }}
@@ -80,25 +99,47 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.92)", cursor: "zoom-out" }}
-            onClick={() => setLightboxOpen(false)}
+            className="fixed inset-0 z-50"
+            style={{ background: "rgba(0,0,0,0.92)" }}
           >
-            <div className="relative w-screen h-screen">
-              <Image
-                src={src}
-                alt="Photo fullscreen"
-                fill
-                priority
-                className="object-contain"
-                sizes="100vw"
-                style={{ cursor: "zoom-out" }}
-              />
-            </div>
-            <span
-              className="absolute top-4 right-6 font-mono text-[0.66rem] text-white/50 pointer-events-none"
+            {/* Zoom container */}
+            <div
+              className="relative w-screen h-screen overflow-hidden"
+              onClick={handleLightboxClick}
+              style={{ cursor: zoom > 1 ? "zoom-out" : "zoom-in" }}
             >
-              ESC / click to close
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  height: "100%",
+                  transform: `scale(${zoom})`,
+                  transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                  transition: "transform 0.3s ease",
+                }}
+              >
+                <Image
+                  src={src}
+                  alt="Photo fullscreen"
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                />
+              </div>
+            </div>
+
+            {/* Close button */}
+            <button
+              className="absolute top-4 right-6 z-10 font-mono text-[1.6rem] leading-none text-white/60 hover:text-white bg-transparent border-none cursor-pointer focus-red p-1"
+              onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
+              aria-label="Close lightbox"
+            >
+              ×
+            </button>
+
+            {/* Hint */}
+            <span className="absolute bottom-4 left-1/2 -translate-x-1/2 font-mono text-[0.62rem] text-white/40 pointer-events-none whitespace-nowrap">
+              {zoom > 1 ? "Click to zoom out · ESC to close" : "Click to zoom in · ESC to close"}
             </span>
           </motion.div>
         )}

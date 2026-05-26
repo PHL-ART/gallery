@@ -3,6 +3,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { AdminDeleteButton } from "./AdminDeleteButton";
+import { LocationPicker } from "./LocationPicker";
+
+interface Coords {
+  lat: number;
+  lon: number;
+}
 
 interface Props {
   photo: {
@@ -11,6 +17,7 @@ interface Props {
     shotAt: string | null;
     albumIds: string[];
     tagIds: string[];
+    exifData: Record<string, string> | null;
   };
   photoUrl: string;
   albums: { id: string; title: string; isSpecial: boolean }[];
@@ -25,16 +32,41 @@ export function AdminPhotoEditForm({ photo, photoUrl, albums, tags }: Props) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const initialGps: Coords | null =
+    photo.exifData?.latitude && photo.exifData?.longitude
+      ? {
+          lat: parseFloat(photo.exifData.latitude),
+          lon: parseFloat(photo.exifData.longitude),
+        }
+      : null;
+  const [gps, setGps] = useState<Coords | null>(initialGps);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
   function toggleId(ids: string[], id: string, setter: (v: string[]) => void) {
     setter(ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]);
   }
 
   async function handleSave() {
     setSaving(true);
+
+    const updatedExifData: Record<string, string> = { ...(photo.exifData ?? {}) };
+    if (gps) {
+      updatedExifData.latitude = String(gps.lat);
+      updatedExifData.longitude = String(gps.lon);
+    } else {
+      delete updatedExifData.latitude;
+      delete updatedExifData.longitude;
+    }
+
     await fetch(`/api/photos/${photo.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shotAt: shotAt || null, albumIds, tagIds }),
+      body: JSON.stringify({
+        shotAt: shotAt || null,
+        albumIds,
+        tagIds,
+        exifData: updatedExifData,
+      }),
     });
     setSaving(false);
     setSaved(true);
@@ -80,6 +112,54 @@ export function AdminPhotoEditForm({ photo, photoUrl, albums, tags }: Props) {
           className={inputCls}
           style={border}
         />
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <span className="font-mono text-[0.58rem] font-bold uppercase tracking-[0.16em] text-muted">
+            Location
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPickerOpen((o) => !o)}
+              className="font-mono text-[0.6rem] font-bold uppercase tracking-[0.1em] px-3 py-1.5 bg-panel-hi text-primary hover:bg-[var(--text)] hover:text-[var(--bg)] transition-colors duration-150"
+            >
+              {pickerOpen ? "Close map" : gps ? "Edit location" : "Set location"}
+            </button>
+            {gps && !pickerOpen && (
+              <button
+                type="button"
+                onClick={() => setGps(null)}
+                className="font-mono text-[0.6rem] font-bold uppercase tracking-[0.1em] px-3 py-1.5 bg-panel-hi text-muted hover:bg-[var(--red)] hover:text-[oklch(0.97_0.006_25)] transition-colors duration-150"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+
+        {gps && !pickerOpen && (
+          <div className="font-mono text-[0.65rem] text-muted" style={border}>
+            <span className="px-3 py-2 block">
+              {gps.lat.toFixed(5)}, {gps.lon.toFixed(5)}
+            </span>
+          </div>
+        )}
+        {!gps && !pickerOpen && (
+          <div className="font-mono text-[0.65rem] text-muted px-0">No location set</div>
+        )}
+
+        {pickerOpen && (
+          <LocationPicker
+            initial={gps ?? undefined}
+            onConfirm={(coords) => {
+              setGps(coords);
+              setPickerOpen(false);
+            }}
+            onCancel={() => setPickerOpen(false)}
+          />
+        )}
       </div>
 
       <div>

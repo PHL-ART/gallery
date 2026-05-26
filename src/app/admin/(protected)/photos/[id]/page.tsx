@@ -46,6 +46,7 @@ export default async function AdminPhotoEditPage({ params }: Props) {
           shotAt: photo.shotAt?.toISOString() ?? null,
           albumIds: photo.albums.map((a) => a.albumId),
           tagIds: photo.tags.map((t) => t.tagId),
+          exifData: (photo.exifData as Record<string, string> | null) ?? null,
         }}
         photoUrl={getPhotoUrl(photo.s3Key)}
         albums={albums.map((a) => ({ id: a.id, title: a.title, isSpecial: a.isSpecial }))}

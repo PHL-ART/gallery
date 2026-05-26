@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { AdminAlbumEditForm } from "@/shared/ui/AdminAlbumEditForm";
 import { AdminDeleteButton } from "@/shared/ui/AdminDeleteButton";
+import { getPhotoUrl } from "@/shared/utils/getPhotoUrl";
 
 export const dynamic = "force-dynamic";
 
@@ -11,11 +12,20 @@ interface Props {
 }
 
 export default async function AdminAlbumEditPage({ params }: Props) {
-  const album = await prisma.album.findUnique({
-    where: { id: params.id },
-    include: { _count: { select: { photos: true } } },
-  });
+  const [album, rawPhotos] = await Promise.all([
+    prisma.album.findUnique({
+      where: { id: params.id },
+      include: { _count: { select: { photos: true } } },
+    }),
+    prisma.photo.findMany({
+      where: { albums: { some: { albumId: params.id } } },
+      select: { id: true, s3Key: true },
+      orderBy: { publishedAt: "desc" },
+    }),
+  ]);
   if (!album) notFound();
+
+  const photos = rawPhotos.map((p) => ({ id: p.id, url: getPhotoUrl(p.s3Key) }));
 
   return (
     <div className="p-8 max-w-2xl">
@@ -44,7 +54,7 @@ export default async function AdminAlbumEditPage({ params }: Props) {
           description: album.description ?? "",
           isSpecial: album.isSpecial,
         }}
-        photos={[]}
+        photos={photos}
       />
 
       <div className="mt-10 pt-6" style={{ borderTop: "1px solid var(--surface-hi)" }}>

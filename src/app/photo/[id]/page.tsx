@@ -31,11 +31,19 @@ function transformExif(
   if (raw.ISO) out.push({ key: "ISO", value: raw.ISO });
   if (raw.FNumber) out.push({ key: "FNumber", value: raw.FNumber });
 
-  // ExposureTime float → "1/N"
+  // ExposureTime float → "1/N" or "Ns"
   if (raw.ExposureTime) {
     const n = parseFloat(raw.ExposureTime);
-    const formatted =
-      !isNaN(n) && n > 0 && n < 1 ? `1/${Math.round(1 / n)}` : raw.ExposureTime;
+    let formatted: string;
+    if (!isNaN(n) && n > 0) {
+      if (n < 1) {
+        formatted = `1/${Math.round(1 / n)}`;
+      } else {
+        formatted = n === 1 ? "1s" : `${n}s`;
+      }
+    } else {
+      formatted = raw.ExposureTime;
+    }
     out.push({ key: "ExposureTime", value: formatted });
   }
 
@@ -46,7 +54,12 @@ function transformExif(
 
   // DateTimeOriginal → "YYYY.MM.DD HH:MM"
   if (raw.DateTimeOriginal) {
-    const d = new Date(raw.DateTimeOriginal);
+    let d = new Date(raw.DateTimeOriginal);
+    // Fallback: handle raw EXIF format "YYYY:MM:DD HH:MM:SS"
+    if (isNaN(d.getTime())) {
+      const normalized = raw.DateTimeOriginal.replace(/^(\d{4}):(\d{2}):(\d{2})/, "$1-$2-$3");
+      d = new Date(normalized);
+    }
     if (!isNaN(d.getTime())) {
       const p = (n: number) => String(n).padStart(2, "0");
       const fmt = `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
@@ -142,10 +155,12 @@ export default async function PhotoPage({ params, searchParams }: Props) {
 
   const rawExif = photo.exifData as Record<string, string> | null;
 
-  const gps =
-    rawExif?.latitude && rawExif?.longitude
-      ? { lat: parseFloat(rawExif.latitude), lon: parseFloat(rawExif.longitude) }
-      : null;
+  const gps = (() => {
+    if (!rawExif?.latitude || !rawExif?.longitude) return null;
+    const lat = parseFloat(rawExif.latitude);
+    const lon = parseFloat(rawExif.longitude);
+    return !isNaN(lat) && !isNaN(lon) ? { lat, lon } : null;
+  })();
 
   const exifEntries = rawExif ? transformExif(rawExif) : [];
 

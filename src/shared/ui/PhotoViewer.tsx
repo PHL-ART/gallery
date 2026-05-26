@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface Props {
   src: string;
@@ -13,15 +14,17 @@ interface Props {
 
 export function PhotoViewer({ src, prevHref, nextHref }: Props) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    if (!lightboxOpen) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "ArrowLeft" && prevHref) router.push(prevHref);
+      if (e.key === "ArrowRight" && nextHref) router.push(nextHref);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [lightboxOpen]);
+  }, [prevHref, nextHref, router]);
 
   return (
     <div
@@ -81,10 +84,7 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
             style={{ background: "rgba(0,0,0,0.92)", cursor: "zoom-out" }}
             onClick={() => setLightboxOpen(false)}
           >
-            <div
-              className="relative w-screen h-screen"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="relative w-screen h-screen">
               <Image
                 src={src}
                 alt="Photo fullscreen"
@@ -92,7 +92,6 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
                 priority
                 className="object-contain"
                 sizes="100vw"
-                onClick={() => setLightboxOpen(false)}
                 style={{ cursor: "zoom-out" }}
               />
             </div>

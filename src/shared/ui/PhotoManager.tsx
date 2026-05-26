@@ -42,6 +42,7 @@ function PhotoCell({
         border: changed ? "2px solid var(--red)" : "1px solid var(--surface-hi)",
       }}
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={photo.url}
         alt=""

@@ -8,5 +8,5 @@ npm-debug.log*
 README.md
 design/
 
-.superpowers/
-docs/superpowers/
+/.superpowers
+/docs/superpowers/

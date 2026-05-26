@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/shared/ui/ThemeToggle";
 
 interface PhotoPageHeaderProps {
   contextLabel?: string;
   contextHref?: string;
-  position?: string; // e.g. "8 / 48"
+  position?: string;
 }
 
 export function PhotoPageHeader({ contextLabel, contextHref, position }: PhotoPageHeaderProps) {
@@ -17,22 +18,25 @@ export function PhotoPageHeader({ contextLabel, contextHref, position }: PhotoPa
         ph<span className="text-accent">1</span>l74
       </Link>
 
-      {contextLabel && (
-        <div className="flex items-center gap-2 font-mono text-[0.66rem]">
-          <Link
-            href={contextHref ?? "#"}
-            className="text-muted no-underline hover-primary transition-colors duration-150 focus-red"
-          >
-            {contextLabel}
-          </Link>
-          {position && (
-            <>
-              <span className="text-muted opacity-40" aria-hidden="true">›</span>
-              <span className="text-muted">{position}</span>
-            </>
-          )}
-        </div>
-      )}
+      <div className="flex items-center gap-4">
+        {contextLabel && (
+          <div className="flex items-center gap-2 font-mono text-[0.66rem]">
+            <Link
+              href={contextHref ?? "#"}
+              className="text-muted no-underline hover-primary transition-colors duration-150 focus-red"
+            >
+              {contextLabel}
+            </Link>
+            {position && (
+              <>
+                <span className="text-muted opacity-40" aria-hidden="true">›</span>
+                <span className="text-muted">{position}</span>
+              </>
+            )}
+          </div>
+        )}
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

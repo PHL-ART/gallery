@@ -11,6 +11,8 @@
 !.yarn/versions
 .agents
 .claude
+.superpowers/
+docs/superpowers/
 
 PROMPT.md
 prereq.md

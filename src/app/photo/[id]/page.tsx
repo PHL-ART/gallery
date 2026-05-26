@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { PhotoPageHeader } from "@/shared/ui/PhotoPageHeader";
 import { ExifPanel } from "@/shared/ui/ExifPanel";
@@ -8,12 +7,57 @@ import { Footer } from "@/shared/ui/Footer";
 import { getPhotoUrl } from "@/shared/utils/getPhotoUrl";
 import { getPhoto } from "@/shared/lib/queries";
 import { prisma } from "@/shared/lib/prisma";
+import { PhotoViewer } from "@/shared/ui/PhotoViewer";
+import { PhotoActions } from "@/shared/ui/PhotoActions";
+import { LocationMap } from "@/shared/ui/LocationMap";
 
 export const dynamic = "force-dynamic";
 
 interface Props {
   params: { id: string };
   searchParams: { from?: string; contextId?: string };
+}
+
+function transformExif(
+  raw: Record<string, string>
+): Array<{ key: string; value: string }> {
+  const out: Array<{ key: string; value: string }> = [];
+
+  // Merge Make + Model → Camera
+  const camera = [raw.Make ?? "", raw.Model ?? ""].filter(Boolean).join(" ");
+  if (camera) out.push({ key: "Camera", value: camera });
+
+  if (raw.LensModel) out.push({ key: "LensModel", value: raw.LensModel });
+  if (raw.ISO) out.push({ key: "ISO", value: raw.ISO });
+  if (raw.FNumber) out.push({ key: "FNumber", value: raw.FNumber });
+
+  // ExposureTime float → "1/N"
+  if (raw.ExposureTime) {
+    const n = parseFloat(raw.ExposureTime);
+    const formatted =
+      !isNaN(n) && n > 0 && n < 1 ? `1/${Math.round(1 / n)}` : raw.ExposureTime;
+    out.push({ key: "ExposureTime", value: formatted });
+  }
+
+  // FocalLength + "mm" suffix, rename label
+  if (raw.FocalLength) {
+    out.push({ key: "Focal length", value: `${raw.FocalLength} mm` });
+  }
+
+  // DateTimeOriginal → "YYYY.MM.DD HH:MM"
+  if (raw.DateTimeOriginal) {
+    const d = new Date(raw.DateTimeOriginal);
+    if (!isNaN(d.getTime())) {
+      const p = (n: number) => String(n).padStart(2, "0");
+      const fmt = `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+      out.push({ key: "Date", value: fmt });
+    } else {
+      out.push({ key: "DateTimeOriginal", value: raw.DateTimeOriginal });
+    }
+  }
+
+  // latitude/longitude NOT included here — shown via LocationMap instead
+  return out;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -96,12 +140,14 @@ export default async function PhotoPage({ params, searchParams }: Props) {
     ? `/photo/${ctx.nextId}${contextQuery ? `?${contextQuery}` : ""}`
     : null;
 
-  const exifEntries = photo.exifData
-    ? Object.entries(photo.exifData as Record<string, string>).map(([key, value]) => ({
-        key,
-        value,
-      }))
-    : [];
+  const rawExif = photo.exifData as Record<string, string> | null;
+
+  const gps =
+    rawExif?.latitude && rawExif?.longitude
+      ? { lat: parseFloat(rawExif.latitude), lon: parseFloat(rawExif.longitude) }
+      : null;
+
+  const exifEntries = rawExif ? transformExif(rawExif) : [];
 
   const shotAtFormatted = photo.shotAt
     ? new Date(photo.shotAt).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\./g, ".")
@@ -121,40 +167,7 @@ export default async function PhotoPage({ params, searchParams }: Props) {
 
       <div className="grid grid-cols-[1fr_320px] flex-1 min-h-0 max-[900px]:grid-cols-1">
         {/* Photo pane */}
-        <div
-          className="relative flex items-center justify-center min-h-[calc(100svh-60px)] max-[900px]:min-h-[70vw]"
-          style={{ background: "oklch(0.06 0.004 25)" }}
-        >
-          <Image
-            src={src}
-            alt="Street photo"
-            width={1200}
-            height={1600}
-            priority
-            className="max-w-full object-contain"
-            style={{ maxHeight: "calc(100svh - 60px)" }}
-          />
-
-          {prevHref && (
-            <Link
-              href={prevHref}
-              aria-label="Previous photo"
-              className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-[var(--text)] text-[var(--bg)] no-underline transition-colors duration-150 hover:bg-[var(--red)] hover:text-[oklch(0.97_0.006_25)] focus-red max-[900px]:left-2 max-[900px]:w-10 max-[900px]:h-10"
-            >
-              ←
-            </Link>
-          )}
-
-          {nextHref && (
-            <Link
-              href={nextHref}
-              aria-label="Next photo"
-              className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-[var(--text)] text-[var(--bg)] no-underline transition-colors duration-150 hover:bg-[var(--red)] hover:text-[oklch(0.97_0.006_25)] focus-red max-[900px]:right-2 max-[900px]:w-10 max-[900px]:h-10"
-            >
-              →
-            </Link>
-          )}
-        </div>
+        <PhotoViewer src={src} prevHref={prevHref} nextHref={nextHref} />
 
         {/* Sidebar */}
         <aside className="bg-panel flex flex-col overflow-y-auto" aria-label="Photo details">
@@ -218,6 +231,24 @@ export default async function PhotoPage({ params, searchParams }: Props) {
               </div>
             </>
           )}
+          {/* GPS Map */}
+          {gps && (
+            <>
+              <div className="h-px mx-lg" style={{ background: "var(--surface-hi)" }} />
+              <div className="px-lg pt-xl pb-0">
+                <span className="block font-mono text-[0.58rem] font-bold uppercase tracking-[0.16em] text-muted mb-3">
+                  Location
+                </span>
+              </div>
+              <LocationMap lat={gps.lat} lon={gps.lon} />
+            </>
+          )}
+
+          {/* Spacer pushes Actions to bottom */}
+          <div className="flex-1" />
+
+          <div className="h-px mx-lg" style={{ background: "var(--surface-hi)" }} />
+          <PhotoActions rawUrl={src} />
         </aside>
       </div>
 

@@ -28,11 +28,11 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
 
   return (
     <div
-      className="relative flex items-center justify-center min-h-[calc(100svh-60px)] max-[900px]:min-h-[70vw] bg-canvas"
+      className="relative flex items-center justify-center min-h-[calc(100svh-120px)] max-[900px]:min-h-[70vw] bg-canvas"
     >
       {/* Zoomable image */}
       <motion.div
-        className="relative w-full h-full min-h-[calc(100svh-60px)] max-[900px]:min-h-[70vw]"
+        className="relative w-full h-full min-h-[calc(100svh-120px)] max-[900px]:min-h-[70vw]"
         style={{ cursor: "zoom-in" }}
         whileHover={{ scale: 1.015 }}
         transition={{ duration: 0.3, ease: [0.25, 0, 0.15, 1] }}

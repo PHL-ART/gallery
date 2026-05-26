@@ -267,7 +267,7 @@ export default async function PhotoPage({ params, searchParams }: Props) {
         </aside>
       </div>
 
-      <Footer />
+      <Footer compact />
     </>
   );
 }

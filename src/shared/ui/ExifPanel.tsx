@@ -29,7 +29,7 @@ export function ExifPanel({ data }: { data: ExifEntry[] }) {
           i
         </button>
         <span className="font-mono text-[0.66rem] font-bold uppercase tracking-[0.1em] text-muted">
-          EXIF Data
+          Info
         </span>
       </div>
 

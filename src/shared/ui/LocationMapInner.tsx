@@ -9,6 +9,8 @@ interface Props {
   theme: "dark" | "light";
 }
 
+const RED_MARKER = "oklch(0.48 0.20 25)";
+
 export function LocationMapInner({ lat, lon, theme }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -19,11 +21,11 @@ export function LocationMapInner({ lat, lon, theme }: Props) {
     const map = L.map(containerRef.current, {
       center: [lat, lon],
       zoom: 13,
-      zoomControl: false,
-      dragging: false,
+      zoomControl: true,
+      dragging: true,
       scrollWheelZoom: false,
-      doubleClickZoom: false,
-      touchZoom: false,
+      doubleClickZoom: true,
+      touchZoom: true,
       keyboard: false,
       attributionControl: false,
     });
@@ -35,12 +37,8 @@ export function LocationMapInner({ lat, lon, theme }: Props) {
 
     L.tileLayer(tileUrl, { maxZoom: 19, subdomains: "abcd" }).addTo(map);
 
-    const markerBg = theme === "dark" ? "#fff" : "oklch(0.48 0.20 25)";
-    const markerOutline =
-      theme === "dark" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.18)";
-
     const icon = L.divIcon({
-      html: `<div style="width:8px;height:8px;background:${markerBg};outline:2px solid ${markerOutline}"></div>`,
+      html: `<div style="width:8px;height:8px;background:${RED_MARKER};outline:2px solid rgba(0,0,0,0.22)"></div>`,
       className: "",
       iconSize: [8, 8],
       iconAnchor: [4, 4],
@@ -57,22 +55,25 @@ export function LocationMapInner({ lat, lon, theme }: Props) {
 
   const filter =
     theme === "dark"
-      ? "grayscale(1) brightness(0.75) contrast(1.15)"
-      : "grayscale(0.3) brightness(1.0) contrast(1.05)";
+      ? "brightness(0.8) contrast(1.1)"
+      : "brightness(1.0) contrast(1.02)";
 
   return (
-    <a
-      href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block"
-      aria-label="Open location in OpenStreetMap"
-    >
+    <div>
       <div
         ref={containerRef}
-        style={{ height: 160, filter }}
-        className="w-full pointer-events-none"
+        style={{ height: 200, filter }}
+        className="w-full"
       />
-    </a>
+      <a
+        href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block font-mono text-[0.58rem] text-muted no-underline hover-primary transition-colors duration-150 mt-1 text-right"
+        aria-label="Open location in OpenStreetMap"
+      >
+        Open in OpenStreetMap ↗
+      </a>
+    </div>
   );
 }

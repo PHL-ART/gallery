@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,13 +16,15 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+  const isHoldingRef = useRef(false);
   const router = useRouter();
 
-  const closeLightbox = () => {
+  const closeLightbox = useCallback(() => {
     setLightboxOpen(false);
     setZoom(1);
     setZoomOrigin({ x: 50, y: 50 });
-  };
+    isHoldingRef.current = false;
+  }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -32,19 +34,33 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [prevHref, nextHref, router]);
+  }, [prevHref, nextHref, router, closeLightbox]);
 
-  const handleLightboxClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const getOriginFromEvent = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    if (zoom === 1) {
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      setZoomOrigin({ x, y });
-      setZoom(2.5);
-    } else {
-      setZoom(1);
-      setZoomOrigin({ x: 50, y: 50 });
-    }
+    return {
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    };
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    isHoldingRef.current = true;
+    setZoomOrigin(getOriginFromEvent(e));
+    setZoom(2.5);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isHoldingRef.current) return;
+    setZoomOrigin(getOriginFromEvent(e));
+  };
+
+  const handleMouseUp = () => {
+    if (!isHoldingRef.current) return;
+    isHoldingRef.current = false;
+    setZoom(1);
+    setZoomOrigin({ x: 50, y: 50 });
   };
 
   return (
@@ -105,8 +121,11 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
             {/* Zoom container */}
             <div
               className="relative w-screen h-screen overflow-hidden"
-              onClick={handleLightboxClick}
-              style={{ cursor: zoom > 1 ? "zoom-out" : "zoom-in" }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              style={{ cursor: zoom > 1 ? "grabbing" : "zoom-in" }}
             >
               <div
                 style={{
@@ -115,7 +134,7 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
                   height: "100%",
                   transform: `scale(${zoom})`,
                   transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
-                  transition: "transform 0.3s ease",
+                  transition: zoom > 1 ? "none" : "transform 0.2s ease",
                 }}
               >
                 <Image
@@ -124,6 +143,7 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
                   fill
                   className="object-contain"
                   sizes="100vw"
+                  draggable={false}
                 />
               </div>
             </div>
@@ -139,7 +159,7 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
 
             {/* Hint */}
             <span className="absolute bottom-4 left-1/2 -translate-x-1/2 font-mono text-[0.62rem] text-white/40 pointer-events-none whitespace-nowrap">
-              {zoom > 1 ? "Click to zoom out · ESC to close" : "Click to zoom in · ESC to close"}
+              {zoom > 1 ? "Release to zoom out · ESC to close" : "Hold to zoom · ESC to close"}
             </span>
           </motion.div>
         )}

@@ -27,7 +27,7 @@ function transformExif(
   const camera = [raw.Make ?? "", raw.Model ?? ""].filter(Boolean).join(" ");
   if (camera) out.push({ key: "Camera", value: camera });
 
-  if (raw.LensModel) out.push({ key: "LensModel", value: raw.LensModel });
+  if (raw.LensModel) out.push({ key: "Lens", value: raw.LensModel });
   if (raw.ISO) out.push({ key: "ISO", value: raw.ISO });
   if (raw.FNumber) out.push({ key: "FNumber", value: raw.FNumber });
 

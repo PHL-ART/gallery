@@ -74,8 +74,15 @@ function transformExif(
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await getPhoto(params.id);
-  return { title: "Photo — ph1l74" };
+  const photo = await getPhoto(params.id);
+  const tagList = photo.tags.map((pt) => pt.tag.title).join(", ");
+  return {
+    title: "Photo — Filat Astakhov",
+    description: tagList || "Street and documentary photography by Filat Astakhov",
+    openGraph: {
+      images: [`/api/og?type=photo&id=${params.id}`],
+    },
+  };
 }
 
 async function getContext(

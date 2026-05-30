@@ -5,13 +5,14 @@ import { getPhotoUrl } from "@/shared/utils/getPhotoUrl";
 
 export const runtime = "nodejs";
 
-// Module-level font cache — loaded once per cold start
-let fontBarlow: ArrayBuffer | null = null;
-let fontAzeret: ArrayBuffer | null = null;
+// Module-level font cache — loaded once per cold start (promise cache prevents double-fetch on concurrent cold starts)
+let fontBarlowPromise: Promise<ArrayBuffer> | null = null;
+let fontAzeretPromise: Promise<ArrayBuffer> | null = null;
 
 async function loadGoogleFont(family: string, weight: number): Promise<ArrayBuffer> {
   const params = new URLSearchParams({ family: `${family}:wght@${weight}`, display: "swap" });
   const css = await fetch(`https://fonts.googleapis.com/css2?${params}`, {
+    signal: AbortSignal.timeout(5000),
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
@@ -21,13 +22,14 @@ async function loadGoogleFont(family: string, weight: number): Promise<ArrayBuff
 
   const match = css.match(/src: url\((.+?)\) format\('woff2'\)/);
   if (!match) throw new Error(`Font not found: ${family} ${weight}`);
-  return fetch(match[1]).then((r) => r.arrayBuffer());
+  return fetch(match[1], { signal: AbortSignal.timeout(5000) }).then((r) => r.arrayBuffer());
 }
 
 async function getFonts() {
-  if (!fontBarlow) fontBarlow = await loadGoogleFont("Barlow Condensed", 900);
-  if (!fontAzeret) fontAzeret = await loadGoogleFont("Azeret Mono", 700);
-  return { barlow: fontBarlow, azeret: fontAzeret };
+  if (!fontBarlowPromise) fontBarlowPromise = loadGoogleFont("Barlow Condensed", 900);
+  if (!fontAzeretPromise) fontAzeretPromise = loadGoogleFont("Azeret Mono", 700);
+  const [barlow, azeret] = await Promise.all([fontBarlowPromise, fontAzeretPromise]);
+  return { barlow, azeret };
 }
 
 async function fetchImageAsDataUrl(url: string): Promise<string | null> {
@@ -183,7 +185,7 @@ export async function GET(req: NextRequest) {
         select: { s3Key: true },
       });
       imageUrl = latest ? getPhotoUrl(latest.s3Key) : null;
-      label = searchParams.get("label") ?? "Gallery";
+      label = (searchParams.get("label") ?? "Gallery").slice(0, 60);
 
     } else {
       return new Response("Invalid type", { status: 400 });

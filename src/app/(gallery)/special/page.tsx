@@ -5,7 +5,11 @@ import { getAlbums } from "@/shared/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Special — ph1l74" };
+export const metadata: Metadata = {
+  title: "Special — Filat Astakhov",
+  description: "Curated special series by Filat Astakhov",
+  openGraph: { images: ["/api/og?type=listing&label=Special"] },
+};
 
 export default async function SpecialPage() {
   const albums = await getAlbums(true);

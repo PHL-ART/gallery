@@ -4,7 +4,11 @@ import { getTags } from "@/shared/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Tags — ph1l74" };
+export const metadata: Metadata = {
+  title: "Tags — Filat Astakhov",
+  description: "Browse photos by tags",
+  openGraph: { images: ["/api/og?type=listing&label=Tags"] },
+};
 
 export default async function TagsPage() {
   const tags = await getTags();

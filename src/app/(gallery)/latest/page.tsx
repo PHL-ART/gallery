@@ -5,7 +5,11 @@ import { getPhotos } from "@/shared/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Latest — ph1l74" };
+export const metadata: Metadata = {
+  title: "Latest — Filat Astakhov",
+  description: "Latest photos by Filat Astakhov",
+  openGraph: { images: ["/api/og?type=listing&label=Latest"] },
+};
 
 export default async function LatestPage() {
   const photos = await getPhotos();

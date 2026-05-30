@@ -11,7 +11,13 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tag = await getTag(params.id);
-  return { title: `${tag.title} — ph1l74` };
+  return {
+    title: `#${tag.title} — Filat Astakhov`,
+    description: `${tag.photos.length} photos tagged ${tag.title}`,
+    openGraph: {
+      images: [`/api/og?type=tag&id=${params.id}`],
+    },
+  };
 }
 
 export default async function TagPage({ params }: Props) {

@@ -13,7 +13,13 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const album = await getAlbum(params.id);
-  return { title: `${album.title} — ph1l74` };
+  return {
+    title: `${album.title} — Filat Astakhov`,
+    description: `${album.photos.length} photos · ${album.title}`,
+    openGraph: {
+      images: [`/api/og?type=album&id=${params.id}`],
+    },
+  };
 }
 
 export default async function AlbumPage({ params, searchParams }: Props) {

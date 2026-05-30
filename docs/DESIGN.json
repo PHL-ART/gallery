@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-30T00:00:00Z",
+  "title": "Design System: ph1l74 Gallery",
+  "extensions": {
+    "colorMeta": {
+      "darkroom-black":      { "role": "neutral",  "displayName": "Darkroom Black",      "canonical": "oklch(0.10 0.006 25)", "tonalRamp": ["oklch(0.05 0.004 25)","oklch(0.10 0.006 25)","oklch(0.18 0.006 25)","oklch(0.28 0.006 25)","oklch(0.40 0.006 25)","oklch(0.55 0.006 25)","oklch(0.72 0.006 25)","oklch(0.90 0.006 25)"] },
+      "darkroom-surface":    { "role": "neutral",  "displayName": "Darkroom Surface",     "canonical": "oklch(0.14 0.006 25)", "tonalRamp": ["oklch(0.07 0.004 25)","oklch(0.14 0.006 25)","oklch(0.22 0.006 25)","oklch(0.32 0.006 25)","oklch(0.44 0.006 25)","oklch(0.58 0.006 25)","oklch(0.74 0.006 25)","oklch(0.92 0.008 25)"] },
+      "darkroom-surface-hi": { "role": "neutral",  "displayName": "Darkroom Surface Hi",  "canonical": "oklch(0.18 0.006 25)", "tonalRamp": ["oklch(0.08 0.004 25)","oklch(0.18 0.006 25)","oklch(0.26 0.006 25)","oklch(0.36 0.006 25)","oklch(0.48 0.006 25)","oklch(0.62 0.006 25)","oklch(0.78 0.006 25)","oklch(0.94 0.008 25)"] },
+      "film-border":         { "role": "neutral",  "displayName": "Film Border",          "canonical": "oklch(0.22 0.006 25)", "tonalRamp": ["oklch(0.10 0.004 25)","oklch(0.22 0.006 25)","oklch(0.32 0.006 25)","oklch(0.42 0.006 25)","oklch(0.54 0.006 25)","oklch(0.68 0.006 25)","oklch(0.82 0.006 25)","oklch(0.95 0.006 25)"] },
+      "half-tone-grey":      { "role": "neutral",  "displayName": "Half-tone Grey",       "canonical": "oklch(0.48 0.006 25)", "tonalRamp": ["oklch(0.12 0.004 25)","oklch(0.24 0.006 25)","oklch(0.36 0.006 25)","oklch(0.48 0.006 25)","oklch(0.60 0.006 25)","oklch(0.72 0.006 25)","oklch(0.84 0.006 25)","oklch(0.95 0.006 25)"] },
+      "newsprint-white":     { "role": "neutral",  "displayName": "Newsprint White",      "canonical": "oklch(0.95 0.006 25)", "tonalRamp": ["oklch(0.15 0.004 25)","oklch(0.30 0.006 25)","oklch(0.45 0.006 25)","oklch(0.60 0.006 25)","oklch(0.72 0.006 25)","oklch(0.82 0.006 25)","oklch(0.90 0.006 25)","oklch(0.95 0.006 25)"] },
+      "press-red":           { "role": "primary",  "displayName": "Press Red",            "canonical": "oklch(0.48 0.20 25)",  "tonalRamp": ["oklch(0.18 0.14 25)","oklch(0.28 0.17 25)","oklch(0.36 0.18 25)","oklch(0.44 0.19 25)","oklch(0.48 0.20 25)","oklch(0.56 0.21 25)","oklch(0.64 0.22 25)","oklch(0.78 0.18 25)"] },
+      "press-red-light":     { "role": "primary",  "displayName": "Press Red Light",      "canonical": "oklch(0.62 0.22 25)",  "tonalRamp": ["oklch(0.22 0.14 25)","oklch(0.34 0.18 25)","oklch(0.44 0.20 25)","oklch(0.54 0.22 25)","oklch(0.62 0.22 25)","oklch(0.70 0.20 25)","oklch(0.80 0.16 25)","oklch(0.90 0.10 25)"] },
+      "press-red-dark":      { "role": "primary",  "displayName": "Press Red Dark",       "canonical": "oklch(0.32 0.18 25)",  "tonalRamp": ["oklch(0.12 0.10 25)","oklch(0.20 0.13 25)","oklch(0.28 0.16 25)","oklch(0.32 0.18 25)","oklch(0.38 0.19 25)","oklch(0.48 0.20 25)","oklch(0.60 0.22 25)","oklch(0.76 0.18 25)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display",      "purpose": "Hero name on homepage only. Two lines maximum." },
+      "title":   { "displayName": "Title",        "purpose": "Album and section headings on content pages." },
+      "label":   { "displayName": "Section Label","purpose": "Sidebar section headers, listing labels. Smallest mono size in system." },
+      "nav":     { "displayName": "Navigation",   "purpose": "Nav links, breadcrumbs, button text, chip labels." },
+      "body":    { "displayName": "Body",         "purpose": "Paragraph copy only (homepage bio). Not used in UI." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "state-change",    "value": "0.15s ease",                        "purpose": "Color and opacity transitions on nav links, theme toggle, context badges." },
+      { "name": "image-reveal",    "value": "opacity 0.35s ease-out, transform 0.45s ease-out", "purpose": "Photo and album card hover — opacity reveal + subtle scale." },
+      { "name": "lightbox-fade",   "value": "0.2s ease",                         "purpose": "Lightbox open/close via Framer Motion AnimatePresence." },
+      { "name": "theme-switch",    "value": "background-color 0.25s ease, color 0.25s ease", "purpose": "Dark/light theme transition on body and header." }
+    ],
+    "breakpoints": [
+      { "name": "md",   "value": "768px",  "purpose": "Mobile layout: single-column grid, reduced padding, stacked hero." },
+      { "name": "lg",   "value": "900px",  "purpose": "Photo page: sidebar collapses below photo pane." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Tag Chip (Default)",
+      "kind": "chip",
+      "refersTo": "tag-chip",
+      "description": "Filter chip for tags and navigation. Inverts fully on hover; turns Press Red when active.",
+      "html": "<a class=\"ds-tag\" href=\"#\">Street</a>",
+      "css": ".ds-tag { display: inline-flex; align-items: center; font-family: 'Azeret Mono', monospace; font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 12px; background: oklch(0.14 0.006 25); color: oklch(0.48 0.006 25); text-decoration: none; border-radius: 0; transition: background-color 0.15s ease, color 0.15s ease; } .ds-tag:hover { background: oklch(0.95 0.006 25); color: oklch(0.10 0.006 25); } .ds-tag:focus-visible { outline: 2px solid oklch(0.48 0.20 25); outline-offset: 3px; }"
+    },
+    {
+      "name": "Tag Chip (Active)",
+      "kind": "chip",
+      "refersTo": "tag-chip-active",
+      "description": "Active filter state — Press Red background.",
+      "html": "<a class=\"ds-tag ds-tag--active\" href=\"#\">Night</a>",
+      "css": ".ds-tag { display: inline-flex; align-items: center; font-family: 'Azeret Mono', monospace; font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 12px; text-decoration: none; border-radius: 0; transition: background-color 0.15s ease, color 0.15s ease; } .ds-tag--active { background: oklch(0.48 0.20 25); color: oklch(0.97 0.006 25); } .ds-tag--active:focus-visible { outline: 2px solid oklch(0.48 0.20 25); outline-offset: 3px; }"
+    },
+    {
+      "name": "Navigation Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Header navigation. Muted at rest, full text on hover, Press Red when current page.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" class=\"ds-nav-link\">Latest</a><a href=\"#\" class=\"ds-nav-link\" aria-current=\"page\">Special</a><a href=\"#\" class=\"ds-nav-link\">Albums</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 32px; } .ds-nav-link { font-family: 'Azeret Mono', monospace; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; text-decoration: none; color: oklch(0.48 0.006 25); transition: color 0.15s ease; } .ds-nav-link:hover { color: oklch(0.95 0.006 25); } .ds-nav-link[aria-current='page'] { color: oklch(0.48 0.20 25); } .ds-nav-link:focus-visible { outline: 2px solid oklch(0.48 0.20 25); outline-offset: 4px; }"
+    },
+    {
+      "name": "Navigation Arrow",
+      "kind": "button",
+      "refersTo": "nav-arrow",
+      "description": "Photo viewer prev/next. Sharp 48px square — inverts to Press Red on hover.",
+      "html": "<div style=\"position:relative;display:inline-flex;gap:8px;\"><button class=\"ds-nav-arrow\">←</button><button class=\"ds-nav-arrow\">→</button></div>",
+      "css": ".ds-nav-arrow { width: 48px; height: 48px; background: oklch(0.95 0.006 25); color: oklch(0.10 0.006 25); border: none; border-radius: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-family: 'Azeret Mono', monospace; transition: background-color 0.15s ease, color 0.15s ease; } .ds-nav-arrow:hover { background: oklch(0.48 0.20 25); color: oklch(0.97 0.006 25); } .ds-nav-arrow:focus-visible { outline: 2px solid oklch(0.48 0.20 25); outline-offset: 3px; }"
+    },
+    {
+      "name": "Context Badge",
+      "kind": "custom",
+      "refersTo": "context-badge",
+      "description": "Sidebar 'Viewing from' link. 5×5px Press Red square dot + album name. Inverts on hover.",
+      "html": "<a class=\"ds-context-badge\" href=\"#\"><span class=\"ds-context-dot\"></span>Moscow Winter 2023</a>",
+      "css": ".ds-context-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'Azeret Mono', monospace; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; background: oklch(0.18 0.006 25); padding: 4px 16px; text-decoration: none; color: oklch(0.95 0.006 25); transition: background-color 0.15s ease, color 0.15s ease; border-radius: 0; } .ds-context-badge:hover { background: oklch(0.95 0.006 25); color: oklch(0.10 0.006 25); } .ds-context-badge:focus-visible { outline: 2px solid oklch(0.48 0.20 25); outline-offset: 3px; } .ds-context-dot { width: 5px; height: 5px; background: oklch(0.48 0.20 25); flex-shrink: 0; }"
+    },
+    {
+      "name": "Sidebar Label",
+      "kind": "custom",
+      "refersTo": "sidebar-label",
+      "description": "Section header within the photo sidebar. Smallest mono size, muted, spaced cap letters.",
+      "html": "<div class=\"ds-sidebar-section\"><span class=\"ds-sidebar-label\">Shot on</span><div style=\"font-family:'Azeret Mono',monospace;font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;\">14.12.2023</div></div>",
+      "css": ".ds-sidebar-section { padding: 32px 24px; } .ds-sidebar-label { display: block; font-family: 'Azeret Mono', monospace; font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: oklch(0.48 0.006 25); margin-bottom: 12px; }"
+    },
+    {
+      "name": "EXIF Row",
+      "kind": "custom",
+      "refersTo": "exif-row",
+      "description": "Key-value pair for camera data. Key muted, value bold. No borders between rows.",
+      "html": "<div class=\"ds-exif-list\"><div class=\"ds-exif-row\"><span class=\"ds-exif-key\">Camera</span><span class=\"ds-exif-val\">Fujifilm X-T4</span></div><div class=\"ds-exif-row\"><span class=\"ds-exif-key\">ISO</span><span class=\"ds-exif-val\">3200</span></div><div class=\"ds-exif-row\"><span class=\"ds-exif-key\">Aperture</span><span class=\"ds-exif-val\">f/5.6</span></div></div>",
+      "css": ".ds-exif-list { display: flex; flex-direction: column; gap: 8px; } .ds-exif-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; } .ds-exif-key { font-family: 'Azeret Mono', monospace; font-size: 0.66rem; color: oklch(0.48 0.006 25); white-space: nowrap; } .ds-exif-val { font-family: 'Azeret Mono', monospace; font-size: 0.66rem; font-weight: 700; color: oklch(0.95 0.006 25); text-align: right; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Gallery Wall at Midnight",
+    "overview": "This is a photography gallery where the interface earns nothing. Every pixel either serves the photograph or disappears. The design references the experience of standing in front of a print in a dark gallery at night — the kind of space where ambient conversation stops, ambient light is absent, and the image is simply there. The architecture of the shell is sharp, quiet, and load-bearing without calling attention to itself.\n\nThe system is built on three colors and three fonts, both held to strict discipline. Red appears at most once per visible screen and marks a single state — never ambient, never decorative. The dark surface is not \"developer aesthetic\" or \"night mode as feature\"; it is the correct value for photographs to breathe at their own luminance, without the eye adjusting to a competing white field. Borders define structure where a lighter system would use cards, shadows, or rounded containers. There are none.",
+    "keyCharacteristics": [
+      "Zero border-radius, globally enforced",
+      "Three colors: near-black, near-white, press-red — no casual grays",
+      "Dark mode primary; light mode structurally identical, only luminance changes",
+      "Monospace for all metadata, labels, navigation — Figtree only for body copy",
+      "Photographs at partial opacity at rest (55–72%), full on interaction",
+      "Flat elevation: depth via tonal layering, never shadows"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule",     "body": "Press Red is used for one active or hover state per screen. Its rarity is not a constraint — it is the point. A screen with three red elements is a screen that has lost control of its hierarchy.", "section": "colors" },
+      { "name": "The Warm Neutral Rule",   "body": "Every surface and text color is tinted toward hue 25 (warm ochre) at chroma 0.006–0.008. Pure grey oklch(L 0 0) is prohibited. The warmth is imperceptible at a glance but prevents the cold, clinical feeling of pure neutral photography portfolios.", "section": "colors" },
+      { "name": "The Flat-By-Default Rule","body": "Surfaces are flat at rest. No shadows appear in response to hover, elevation, or state. If depth is needed, use a tonal step, not a drop-shadow.", "section": "elevation" },
+      { "name": "The Mono-First Rule",     "body": "Figtree is used for one purpose: paragraph body copy. Everything else — navigation, labels, tags, dates, EXIF, counts, footer — is Azeret Mono. Figtree in a nav link or a chip is a mistake.", "section": "typography" },
+      { "name": "The EXIF Rule",           "body": "Metadata is annotation, not feature. Size 0.66rem, weight split: key muted, value bold. It sits quietly until examined.", "section": "typography" }
+    ],
+    "dos": [
+      "Keep Press Red to one use per screen",
+      "Use border-radius: 0 everywhere — the global reset enforces this",
+      "Set images to partial opacity at rest (55% album covers, 72% photo cards)",
+      "Use Azeret Mono for every metadata context: labels, nav, tags, EXIF, counts, footer, dates",
+      "Express depth through tonal steps (Black → Surface → Surface Hi), never shadows",
+      "Use clamp() for display and title headings; fixed rem for UI elements",
+      "Write oklch(L C H) for all color values with chroma 0.005–0.010 at hue 25 for neutrals",
+      "Transition only opacity, transform, and color/background-color — never layout properties",
+      "Use ease-out curves: 0.15s ease for state changes, 0.35–0.45s ease-out for image reveals",
+      "Apply the same focus ring everywhere: outline: 2px solid var(--red); outline-offset: 4px"
+    ],
+    "donts": [
+      "Don't add border-radius anywhere — not even 2px on a button",
+      "Don't introduce shadows (box-shadow, drop-shadow, filter: drop-shadow)",
+      "Don't use glassmorphism (backdrop-filter: blur)",
+      "Don't use gradient text (background-clip: text)",
+      "Don't use border-left or border-right as a colored accent stripe",
+      "Don't introduce a fourth color — the three-color discipline is the system's character",
+      "Don't use Figtree in navigation, chips, labels, or any UI element",
+      "Don't use Space Mono, Inter, or common portfolio-site font defaults",
+      "Don't put images at full opacity at rest — the hover reveal is the interaction",
+      "Don't use oklch(L 0 0) pure neutrals — every surface must tilt toward hue 25",
+      "Don't design with Tumblr softness: no pastel overlays, rounded containers, blush tones, or script fonts",
+      "Don't use neon or blue-purple gradients — this system is not a developer portfolio"
+    ]
+  }
+}

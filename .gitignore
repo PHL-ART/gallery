@@ -11,8 +11,10 @@
 !.yarn/versions
 .agents
 .claude
+# superpowers
 .superpowers/
 docs/superpowers/
+skills-lock.json
 
 PROMPT.md
 prereq.md

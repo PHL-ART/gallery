@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Barlow_Condensed, Figtree, Azeret_Mono } from "next/font/google";
 import { StoreProvider } from "@/store/StoreProvider";
+import { I18nProvider } from "@/shared/providers/I18nProvider";
 import "./globals.css";
 
 const barlowCondensed = Barlow_Condensed({
@@ -64,7 +65,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <StoreProvider>{children}</StoreProvider>
+        <I18nProvider>
+          <StoreProvider>{children}</StoreProvider>
+        </I18nProvider>
 
         {gaId && (
           <>

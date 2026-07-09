@@ -1,0 +1,21 @@
+{
+  "nav": {
+    "home": "Home",
+    "latest": "Latest",
+    "special": "Special",
+    "albums": "Albums",
+    "tags": "Tags"
+  },
+  "home": {
+    "role": "Street photographer",
+    "location": "Based in Russia",
+    "style": "Architecture and streets",
+    "since": "Since 2008",
+    "sections": "Sections",
+    "collections": "{count} collections"
+  },
+  "ui": {
+    "themeLight": "Light",
+    "themeDark": "Dark"
+  }
+}

@@ -1,11 +1,13 @@
 import { AlbumCard } from "@/shared/ui/AlbumCard";
+import { HomeDescription } from "@/shared/ui/HomeDescription";
+import { HomeSectionsBar } from "@/shared/ui/HomeSectionsBar";
 import { getPhotoUrl } from "@/shared/utils/getPhotoUrl";
 import { getAlbums, getPhotos, getTags } from "@/shared/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [photos, specialAlbums, regularAlbums, tags] = await Promise.all([
+  const [photos, specialAlbums, regularAlbums] = await Promise.all([
     getPhotos(),
     getAlbums(true),
     getAlbums(false),
@@ -22,10 +24,10 @@ export default async function HomePage() {
   const tagsCover = photos[1] ? getPhotoUrl(photos[1].s3Key) : undefined;
 
   const sections = [
-    { id: "latest", title: "Latest", count: photos.length, coverSrc: latestCover, href: "/latest" },
-    { id: "special", title: "Special", count: specialAlbums.length, coverSrc: specialCover, href: "/special" },
-    { id: "albums", title: "Albums", count: regularAlbums.length, coverSrc: albumsCover, href: "/albums" },
-    { id: "tags", title: "Tags", count: tags.length, coverSrc: tagsCover, href: "/tags" },
+    { id: "latest",  title: "Latest",  coverSrc: latestCover,  href: "/latest"  },
+    { id: "special", title: "Special", coverSrc: specialCover, href: "/special" },
+    { id: "albums",  title: "Albums",  coverSrc: albumsCover,  href: "/albums"  },
+    { id: "tags",    title: "Tags",    coverSrc: tagsCover,    href: "/tags"    },
   ];
 
   return (
@@ -43,28 +45,10 @@ export default async function HomePage() {
           <span className="text-accent">Astakhov</span>
         </h1>
 
-        <div className="flex flex-col gap-md pb-2 max-md:pb-0">
-          <span className="font-mono text-[0.58rem] font-bold uppercase tracking-[0.18em] text-accent">
-            Street photographer
-          </span>
-          <p className="font-mono text-[0.78rem] text-muted leading-[1.9]">
-            Based in Russia
-            <br />
-            Architecture and streets
-            <br />
-            Since 2008
-          </p>
-        </div>
+        <HomeDescription />
       </section>
 
-      <div className="px-xl mb-lg flex justify-between items-baseline max-md:px-md">
-        <span className="font-mono text-[0.58rem] font-bold uppercase tracking-[0.16em] text-muted">
-          Sections
-        </span>
-        <span className="font-mono text-[0.58rem] font-bold uppercase tracking-[0.16em] text-muted">
-          4 collections
-        </span>
-      </div>
+      <HomeSectionsBar count={sections.length} />
 
       <nav
         className="grid grid-cols-4 gap-md px-xl max-md:grid-cols-2 max-md:gap-sm max-md:px-md"
@@ -75,7 +59,6 @@ export default async function HomePage() {
             key={s.id}
             id={s.id}
             title={s.title}
-            photoCount={s.count}
             coverSrc={s.coverSrc}
             href={s.href}
           />

@@ -31,12 +31,12 @@ export default async function HomePage() {
   return (
     <>
       <section
-        className="px-xl pt-[var(--space-4xl)] pb-[var(--space-3xl)] grid grid-cols-[1fr_240px] gap-[var(--space-3xl)] items-end max-md:grid-cols-1 max-md:px-md max-md:pt-[var(--space-2xl)] max-md:pb-xl max-md:gap-xl"
+        className="px-xl pt-[var(--space-3xl)] pb-[var(--space-3xl)] grid grid-cols-[1fr_240px] gap-[var(--space-3xl)] items-end max-md:grid-cols-1 max-md:px-md max-md:pt-[var(--space-2xl)] max-md:pb-xl max-md:gap-xl"
         aria-label="Photographer introduction"
       >
         <h1
           className="font-display font-black uppercase leading-[0.87] tracking-[-0.02em]"
-          style={{ fontSize: "clamp(5rem, 14vw, 11rem)" }}
+          style={{ fontSize: "clamp(3rem, 11vw, 11rem)" }}
         >
           Filat
           <br />
@@ -50,9 +50,9 @@ export default async function HomePage() {
           <p className="font-mono text-[0.78rem] text-muted leading-[1.9]">
             Based in Russia
             <br />
-            Documentary &amp; urban
+            Architecture and streets
             <br />
-            Since 2018
+            Since 2008
           </p>
         </div>
       </section>

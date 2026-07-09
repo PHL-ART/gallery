@@ -16,11 +16,11 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script: |
             set -e
-            cd ${{ secrets.DEPLOY_PATH }}
+            cd /home/projects/ph1l74-gallery
             git pull origin master
             docker compose up --build -d
             docker image prune -f

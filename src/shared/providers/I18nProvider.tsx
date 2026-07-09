@@ -11,7 +11,9 @@ import ruMessages from "../../../messages/ru.json";
 
 const messages = { en: enMessages, ru: ruMessages };
 
-// Контекст языка — позволяет LanguageSwitcher менять язык без перезагрузки страницы
+// Контекст языка — позволяет LanguageSwitcher менять язык без перезагрузки страницы.
+// Дефолтное значение `{ lang: "en", setLang: () => {} }` используется как fallback,
+// если компонент используется вне I18nProvider (хотя в prod это не должно происходить).
 const LanguageContext = createContext<{
   lang: Locale;
   setLang: (l: Locale) => void;
@@ -22,11 +24,14 @@ export function useLanguage() {
 }
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  // Начальное значение "en" совпадает с SSR — предотвращает hydration mismatch
+  // Начальное значение "en" совпадает с SSR-рендером на сервере.
+  // Это критично для предотвращения hydration mismatch: на сервере нет доступа к localStorage,
+  // поэтому мы всегда стартуем с "en", а затем обновляем в useEffect на клиенте.
   const [lang, setLangState] = useState<Locale>("en");
 
   useEffect(() => {
-    // Читаем язык из localStorage только после гидратации
+    // Читаем язык из localStorage только после гидратации, когда DOM стабилизирован.
+    // Это гарантирует, что значение на клиенте совпадёт с сохранённым выбором пользователя.
     setLangState(getSetting("lang"));
   }, []);
 

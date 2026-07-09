@@ -2,7 +2,7 @@ import { AlbumCard } from "@/shared/ui/AlbumCard";
 import { HomeDescription } from "@/shared/ui/HomeDescription";
 import { HomeSectionsBar } from "@/shared/ui/HomeSectionsBar";
 import { getPhotoUrl } from "@/shared/utils/getPhotoUrl";
-import { getAlbums, getPhotos, getTags } from "@/shared/lib/queries";
+import { getAlbums, getPhotos } from "@/shared/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,6 @@ export default async function HomePage() {
     getPhotos(),
     getAlbums(true),
     getAlbums(false),
-    getTags(),
   ]);
 
   const latestCover = photos[0] ? getPhotoUrl(photos[0].s3Key) : undefined;

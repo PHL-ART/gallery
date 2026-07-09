@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getSetting, setSetting } from "@/shared/lib/settings";
 
 type Theme = "dark" | "light";
 
@@ -8,15 +9,16 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    const saved = (localStorage.getItem("ph1l74-theme") as Theme) || "dark";
+    const saved = getSetting("theme");
     setTheme(saved);
+    document.documentElement.setAttribute("data-theme", saved);
   }, []);
 
   const toggle = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("ph1l74-theme", next);
+    setSetting("theme", next);
   };
 
   return (

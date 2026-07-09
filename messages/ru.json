@@ -12,7 +12,7 @@
     "style": "Архитектура и улицы",
     "since": "С 2008 года",
     "sections": "Разделы",
-    "collections": "{count} коллекции"
+    "collections": "{count, plural, one {# коллекция} few {# коллекции} many {# коллекций} other {# коллекции}}"
   },
   "ui": {
     "themeLight": "Светлая",

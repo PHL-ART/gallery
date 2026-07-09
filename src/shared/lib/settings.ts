@@ -15,6 +15,12 @@ const DEFAULTS: Settings = {
   lang: "en",
 };
 
+// Допустимые значения для каждого ключа настроек
+const VALID_VALUES: Record<keyof Settings, readonly string[]> = {
+  theme: ["dark", "light"],
+  lang: ["en", "ru"],
+};
+
 // SSR-safe чтение: возвращает дефолт если window недоступен или значение некорректно.
 // Проверка `typeof window === "undefined"` необходима, так как функция может вызваться
 // на сервере при SSR или во время гидратации, когда DOM еще недоступен.
@@ -22,7 +28,10 @@ export function getSetting<K extends keyof Settings>(key: K): Settings[K] {
   if (typeof window === "undefined") return DEFAULTS[key];
   try {
     const raw = localStorage.getItem(STORAGE_KEYS[key]);
-    return (raw as Settings[K]) ?? DEFAULTS[key];
+    if (raw !== null && (VALID_VALUES[key] as string[]).includes(raw)) {
+      return raw as Settings[K];
+    }
+    return DEFAULTS[key];
   } catch {
     return DEFAULTS[key];
   }

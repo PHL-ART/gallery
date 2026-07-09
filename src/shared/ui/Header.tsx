@@ -1,35 +1,35 @@
-import Link from "next/link";
+// src/shared/ui/Header.tsx
+"use client";
+
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { NavLink } from "./NavLink";
 import { ThemeToggle } from "./ThemeToggle";
-
-const NAV_LINKS = [
-  { href: "/latest", label: "Latest" },
-  { href: "/special", label: "Special" },
-  { href: "/albums", label: "Albums" },
-  { href: "/tags", label: "Tags" },
-];
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { NAV_LINKS } from "@/shared/config/nav";
 
 export function Header() {
+  const pathname = usePathname();
+  const t = useTranslations("nav");
+  const showHome = pathname !== "/";
+
   return (
     <header className="sticky top-0 z-50 bg-canvas transition-colors duration-[250ms] flex items-center justify-between px-xl h-[60px] max-md:px-md max-md:h-[52px]">
-      <Link
-        href="/"
-        className="font-mono font-bold text-[0.95rem] tracking-[-0.01em] text-primary no-underline focus-red"
-        aria-label="ph1l74 — home"
-      >
-        ph<span className="text-accent">1</span>l74
-      </Link>
+      <nav className="flex items-center gap-xl max-md:gap-md" aria-label="Main navigation">
+        {showHome && (
+          <NavLink href="/">{t("home")}</NavLink>
+        )}
+        {NAV_LINKS.map(({ href, tKey }) => (
+          <NavLink key={href} href={href}>
+            {t(tKey)}
+          </NavLink>
+        ))}
+      </nav>
 
-      <div className="flex items-center gap-[var(--space-2xl)] max-md:gap-lg">
-        <nav className="flex items-center gap-xl max-md:gap-md" aria-label="Main navigation">
-          {NAV_LINKS.map(({ href, label }) => (
-            <NavLink key={href} href={href}>
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-
+      <div className="flex items-center gap-md">
         <ThemeToggle />
+        <span className="text-accent font-bold" aria-hidden="true">·</span>
+        <LanguageSwitcher />
       </div>
     </header>
   );

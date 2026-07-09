@@ -1,0 +1,21 @@
+{
+  "nav": {
+    "home": "Главная",
+    "latest": "Последние",
+    "special": "Избранное",
+    "albums": "Альбомы",
+    "tags": "Теги"
+  },
+  "home": {
+    "role": "Уличный фотограф",
+    "location": "Россия",
+    "style": "Архитектура и улицы",
+    "since": "С 2008 года",
+    "sections": "Разделы",
+    "collections": "{count, plural, one {# коллекция} few {# коллекции} many {# коллекций} other {# коллекции}}"
+  },
+  "ui": {
+    "themeLight": "Светлая",
+    "themeDark": "Тёмная"
+  }
+}

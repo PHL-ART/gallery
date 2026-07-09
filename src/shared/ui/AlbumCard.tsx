@@ -9,13 +9,13 @@ interface AlbumCardProps {
   href?: string;
 }
 
-export function AlbumCard({ id, title, photoCount, coverSrc, href }: AlbumCardProps) {
+export function AlbumCard({ id, title, coverSrc, href }: AlbumCardProps) {
   const target = href ?? `/albums/${id}`;
 
   return (
     <Link
       href={target}
-      className="group flex flex-col gap-2 no-underline text-primary focus-red"
+      className="group block no-underline text-primary focus-red"
     >
       <div className="relative overflow-hidden aspect-[3/4] bg-panel">
         {coverSrc && (
@@ -27,15 +27,16 @@ export function AlbumCard({ id, title, photoCount, coverSrc, href }: AlbumCardPr
             className="object-cover opacity-55 transition-[opacity,transform] duration-300 ease-out group-hover:opacity-100 group-hover:scale-[1.04]"
           />
         )}
-      </div>
 
-      <div className="flex justify-between items-baseline px-1">
-        <span className="font-mono text-[0.68rem] font-bold uppercase tracking-[0.12em]">
-          {title}
-        </span>
-        {photoCount !== undefined && (
-          <span className="font-mono text-[0.6rem] text-muted">{photoCount}</span>
-        )}
+        {/* Тёмный оверлей поверх фото */}
+        <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:opacity-0" />
+
+        {/* Название — поверх фото, внизу. При hover плавно исчезает */}
+        <div className="absolute inset-x-0 bottom-0 px-3 pb-3 transition-opacity duration-300 group-hover:opacity-0">
+          <span className="font-mono text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white drop-shadow-sm">
+            {title}
+          </span>
+        </div>
       </div>
     </Link>
   );

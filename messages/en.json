@@ -20,6 +20,7 @@
   },
   "photo": {
     "sidebar": {
+      "ariaLabel": "Photo details",
       "viewingFrom": "Viewing from",
       "shotOn": "Shot on",
       "published": "Published",

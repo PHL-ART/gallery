@@ -20,6 +20,7 @@
   },
   "photo": {
     "sidebar": {
+      "ariaLabel": "Детали фото",
       "viewingFrom": "Просматривается из",
       "shotOn": "Снято",
       "published": "Опубликовано",

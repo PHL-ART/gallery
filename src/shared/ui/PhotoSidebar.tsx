@@ -11,7 +11,6 @@ interface PhotoSidebarProps {
   ctx: {
     label: string;
     href: string;
-    position?: string;
   } | null;
   exifEntries: Array<{ key: string; value: string }>;
   tags: Array<{ tag: { id: string; title: string } }>;
@@ -33,7 +32,7 @@ export function PhotoSidebar({
   const t = useTranslations("photo.sidebar");
 
   return (
-    <aside className="bg-panel flex flex-col overflow-y-auto" aria-label="Photo details">
+    <aside className="bg-panel flex flex-col overflow-y-auto" aria-label={t("ariaLabel")}>
       {/* Context badge */}
       {ctx && (
         <>
@@ -48,9 +47,6 @@ export function PhotoSidebar({
               <span className="w-[5px] h-[5px] bg-[var(--red)] flex-shrink-0" aria-hidden="true" />
               {ctx.label}
             </Link>
-            {ctx.position && (
-              <span className="block font-mono text-[0.58rem] text-muted mt-2">{ctx.position}</span>
-            )}
           </div>
           <div className="h-px mx-lg" style={{ background: "var(--surface-hi)" }} />
         </>

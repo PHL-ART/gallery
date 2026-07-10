@@ -188,7 +188,7 @@ export default async function PhotoPage({ params, searchParams }: Props) {
         <PhotoViewer src={src} prevHref={prevHref} nextHref={nextHref} />
 
         <PhotoSidebar
-          ctx={ctx ? { label: ctx.label, href: ctx.href, position: ctx.position } : null}
+          ctx={ctx ? { label: ctx.label, href: ctx.href } : null}
           exifEntries={exifEntries}
           tags={photo.tags}
           gps={gps}

@@ -18,6 +18,16 @@
     "themeLight": "Светлая",
     "themeDark": "Тёмная"
   },
+  "sections": {
+    "latestSubtitle": "Все фото",
+    "specialSubtitle": "Избранные серии",
+    "albumsSubtitle": "Коллекции",
+    "tagsSubtitle": "Ключевые слова",
+    "latestCount": "{count, plural, one {# снимок} few {# снимка} many {# снимков} other {# снимков}}",
+    "albumsCount": "{count, plural, one {# альбом} few {# альбома} many {# альбомов} other {# альбомов}}",
+    "specialCount": "{count, plural, one {# альбом} few {# альбома} many {# альбомов} other {# альбомов}}",
+    "tagsCount": "{count, plural, one {# тег} few {# тега} many {# тегов} other {# тегов}}"
+  },
   "photo": {
     "sidebar": {
       "ariaLabel": "Детали фото",

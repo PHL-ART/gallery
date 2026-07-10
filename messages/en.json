@@ -18,6 +18,16 @@
     "themeLight": "Light",
     "themeDark": "Dark"
   },
+  "sections": {
+    "latestSubtitle": "All photos",
+    "specialSubtitle": "Curated series",
+    "albumsSubtitle": "Collections",
+    "tagsSubtitle": "Keywords",
+    "latestCount": "{count} photos",
+    "albumsCount": "{count} albums",
+    "specialCount": "{count} albums",
+    "tagsCount": "{count} tags"
+  },
   "photo": {
     "sidebar": {
       "ariaLabel": "Photo details",

@@ -27,13 +27,8 @@ export default async function AlbumPage({ params, searchParams }: Props) {
   const activeTag = searchParams.tag;
 
   // Collect all unique tags across photos in this album
-  const allTags = Array.from(
-    new Map(
-      album.photos
-        .flatMap((pa) => pa.photo.tags.map((pt) => pt.tag))
-        .map((tag) => [tag.id, tag])
-    ).values()
-  );
+  const flatTags = album.photos.flatMap((pa) => pa.photo.tags.map((pt) => pt.tag));
+  const allTags = Array.from(new Map(flatTags.map((tag) => [tag.id, tag])).values());
 
   // Filter photos by active tag (server-side)
   const filteredPhotos = activeTag

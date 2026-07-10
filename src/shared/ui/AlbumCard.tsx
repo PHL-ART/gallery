@@ -31,9 +31,9 @@ export function AlbumCard({ id, title, coverSrc, href }: AlbumCardProps) {
         {/* Тёмный оверлей поверх фото */}
         <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:opacity-0" />
 
-        {/* Название — поверх фото, внизу. При hover плавно исчезает */}
-        <div className="absolute inset-x-0 bottom-0 px-3 pb-3 transition-opacity duration-300 group-hover:opacity-0">
-          <span className="font-mono text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white drop-shadow-sm">
+        {/* Название — поверх фото, в центре. При hover плавно исчезает */}
+        <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
+          <span className="font-mono text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white drop-shadow-sm text-center px-3">
             {title}
           </span>
         </div>

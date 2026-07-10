@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface ExifEntry {
@@ -7,8 +8,21 @@ interface ExifEntry {
   value: string;
 }
 
+const EXIF_TRANSLATABLE_KEYS = [
+  "Camera", "Lens", "ISO", "FNumber", "ExposureTime", "Focal length", "Date",
+] as const;
+type ExifKey = (typeof EXIF_TRANSLATABLE_KEYS)[number];
+
 export function ExifPanel({ data }: { data: ExifEntry[] }) {
   const [open, setOpen] = useState(true);
+  const t = useTranslations("photo.exif");
+
+  const label = (key: string): string => {
+    if (EXIF_TRANSLATABLE_KEYS.includes(key as ExifKey)) {
+      return t(key as ExifKey);
+    }
+    return key;
+  };
 
   return (
     <>
@@ -29,7 +43,7 @@ export function ExifPanel({ data }: { data: ExifEntry[] }) {
           i
         </button>
         <span className="font-mono text-[0.66rem] font-bold uppercase tracking-[0.1em] text-muted">
-          Info
+          {t("info")}
         </span>
       </div>
 
@@ -48,7 +62,7 @@ export function ExifPanel({ data }: { data: ExifEntry[] }) {
               {data.map(({ key, value }) => (
                 <div key={key} className="flex justify-between items-baseline gap-4">
                   <span className="font-mono text-[0.66rem] text-muted whitespace-nowrap">
-                    {key}
+                    {label(key)}
                   </span>
                   <span className="font-mono text-[0.66rem] font-bold text-right">{value}</span>
                 </div>

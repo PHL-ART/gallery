@@ -17,5 +17,28 @@
   "ui": {
     "themeLight": "Светлая",
     "themeDark": "Тёмная"
+  },
+  "photo": {
+    "sidebar": {
+      "viewingFrom": "Просматривается из",
+      "shotOn": "Снято",
+      "published": "Опубликовано",
+      "tags": "Теги",
+      "location": "Место",
+      "actions": "Действия",
+      "openInRaw": "Открыть в RAW",
+      "copyLink": "Копировать ссылку",
+      "copied": "Скопировано!"
+    },
+    "exif": {
+      "info": "Инфо",
+      "Camera": "Камера",
+      "Lens": "Объектив",
+      "ISO": "ISO",
+      "FNumber": "Диафрагма",
+      "ExposureTime": "Выдержка",
+      "Focal length": "Фок. расстояние",
+      "Date": "Дата"
+    }
   }
 }

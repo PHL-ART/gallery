@@ -17,5 +17,28 @@
   "ui": {
     "themeLight": "Light",
     "themeDark": "Dark"
+  },
+  "photo": {
+    "sidebar": {
+      "viewingFrom": "Viewing from",
+      "shotOn": "Shot on",
+      "published": "Published",
+      "tags": "Tags",
+      "location": "Location",
+      "actions": "Actions",
+      "openInRaw": "Open in RAW",
+      "copyLink": "Copy link",
+      "copied": "Copied!"
+    },
+    "exif": {
+      "info": "Info",
+      "Camera": "Camera",
+      "Lens": "Lens",
+      "ISO": "ISO",
+      "FNumber": "F",
+      "ExposureTime": "Exposure",
+      "Focal length": "Focal length",
+      "Date": "Date"
+    }
   }
 }

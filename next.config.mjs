@@ -1,10 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
-  experimental: {
-    outputFileTracingIncludes: {
-      "/**": ["./node_modules/sharp/**/*", "./node_modules/@img/**/*"],
-    },
+  outputFileTracingIncludes: {
+    "/**": ["./node_modules/sharp/**/*", "./node_modules/@img/**/*"],
   },
   images: {
     remotePatterns: [

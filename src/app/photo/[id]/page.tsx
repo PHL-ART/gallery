@@ -10,8 +10,8 @@ import { PhotoSidebar } from "@/shared/ui/PhotoSidebar";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  params: { id: string };
-  searchParams: { from?: string; contextId?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string; contextId?: string }>;
 }
 
 function transformExif(
@@ -70,13 +70,14 @@ function transformExif(
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const photo = await getPhoto(params.id);
+  const { id } = await params;
+  const photo = await getPhoto(id);
   const tagList = photo.tags.map((pt) => pt.tag.title).join(", ");
   return {
     title: "Photo — Filat Astakhov",
     description: tagList || "Street and documentary photography by Filat Astakhov",
     openGraph: {
-      images: [`/api/og?type=photo&id=${params.id}`],
+      images: [`/api/og?type=photo&id=${id}`],
     },
   };
 }
@@ -140,10 +141,11 @@ async function getContext(
 }
 
 export default async function PhotoPage({ params, searchParams }: Props) {
-  const { from, contextId } = searchParams;
+  const { id } = await params;
+  const { from, contextId } = await searchParams;
   const [photo, ctx] = await Promise.all([
-    getPhoto(params.id),
-    getContext(from, contextId, params.id),
+    getPhoto(id),
+    getContext(from, contextId, id),
   ]);
 
   const src = getPhotoUrl(photo.s3Key);

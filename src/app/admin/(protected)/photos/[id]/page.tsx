@@ -7,13 +7,14 @@ import { getPhotoUrl } from "@/shared/utils/getPhotoUrl";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function AdminPhotoEditPage({ params }: Props) {
+  const { id } = await params;
   const [photo, albums, tags] = await Promise.all([
     prisma.photo.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { albums: true, tags: true },
     }),
     prisma.album.findMany({ orderBy: { title: "asc" } }),

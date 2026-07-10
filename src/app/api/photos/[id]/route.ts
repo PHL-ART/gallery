@@ -4,13 +4,14 @@ import { authOptions } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
 interface Ctx {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(_req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   try {
     const photo = await prisma.photo.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         tags: { include: { tag: true } },
         albums: { include: { album: true } },
@@ -25,6 +26,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
 }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -32,7 +34,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     const { shotAt, exifData, albumIds, tagIds } = await req.json();
 
     const photo = await prisma.photo.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         shotAt: shotAt !== undefined ? (shotAt ? new Date(shotAt) : null) : undefined,
         exifData: exifData !== undefined ? exifData : undefined,
@@ -66,11 +68,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    await prisma.photo.delete({ where: { id: params.id } });
+    await prisma.photo.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

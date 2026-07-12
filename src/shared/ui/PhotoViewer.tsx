@@ -90,7 +90,7 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
           aria-label="Previous photo"
           onClick={(e) => e.stopPropagation()}
           className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-[var(--text)] text-[var(--bg)] no-underline transition-colors duration-150 hover:bg-[var(--red)] hover:text-[oklch(0.97_0.006_25)] focus-red max-[900px]:left-2 max-[900px]:w-10 max-[900px]:h-10 z-10"
-          style={{ cursor: "default" }}
+          style={{ cursor: "pointer" }}
         >
           ←
         </Link>
@@ -101,7 +101,7 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
           aria-label="Next photo"
           onClick={(e) => e.stopPropagation()}
           className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-[var(--text)] text-[var(--bg)] no-underline transition-colors duration-150 hover:bg-[var(--red)] hover:text-[oklch(0.97_0.006_25)] focus-red max-[900px]:right-2 max-[900px]:w-10 max-[900px]:h-10 z-10"
-          style={{ cursor: "default" }}
+          style={{ cursor: "pointer" }}
         >
           →
         </Link>
@@ -137,13 +137,18 @@ export function PhotoViewer({ src, prevHref, nextHref }: Props) {
                   transition: zoom > 1 ? "none" : "transform 0.2s ease",
                 }}
               >
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={src}
                   alt="Photo fullscreen"
-                  fill
-                  className="object-contain"
-                  sizes="100vw"
                   draggable={false}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
                 />
               </div>
             </div>

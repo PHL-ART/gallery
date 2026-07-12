@@ -1,26 +1,26 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Barlow_Condensed, Figtree, Azeret_Mono } from "next/font/google";
+import { Oswald, Inter, JetBrains_Mono } from "next/font/google";
 import { StoreProvider } from "@/store/StoreProvider";
 import { I18nProvider } from "@/shared/providers/I18nProvider";
 import "./globals.css";
 
-const barlowCondensed = Barlow_Condensed({
-  subsets: ["latin"],
-  weight: ["700", "800", "900"],
+const oswald = Oswald({
+  subsets: ["latin", "cyrillic"],
+  weight: ["500", "600", "700"],
   variable: "--font-display",
   display: "swap",
 });
 
-const figtree = Figtree({
-  subsets: ["latin"],
+const inter = Inter({
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
   weight: ["400", "500"],
   variable: "--font-body",
   display: "swap",
 });
 
-const azeretMono = Azeret_Mono({
-  subsets: ["latin"],
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
   weight: ["400", "500", "700"],
   variable: "--font-mono",
   display: "swap",
@@ -34,6 +34,9 @@ export const metadata: Metadata = {
     title: "ph1l74 — Filat Astakhov",
     description: "Street and documentary photography by Filat Astakhov",
     type: "website",
+  },
+  icons: {
+    icon: "/favicon.svg",
   },
 };
 
@@ -58,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       data-theme="dark"
-      className={`${barlowCondensed.variable} ${figtree.variable} ${azeretMono.variable}`}
+      className={`${oswald.variable} ${inter.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <head>

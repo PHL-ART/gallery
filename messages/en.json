@@ -28,6 +28,11 @@
     "specialCount": "{count} albums",
     "tagsCount": "{count} tags"
   },
+  "entity": {
+    "tagLabel": "Tag",
+    "specialLabel": "Special",
+    "photoCount": "{count} photos"
+  },
   "photo": {
     "sidebar": {
       "ariaLabel": "Photo details",

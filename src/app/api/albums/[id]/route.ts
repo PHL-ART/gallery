@@ -4,13 +4,14 @@ import { authOptions } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
 interface Ctx {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(_req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   try {
     const album = await prisma.album.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: { select: { photos: true } },
         photos: {
@@ -32,6 +33,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
 }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -40,7 +42,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
     const result = await prisma.$transaction(async (tx) => {
       const album = await tx.album.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           ...(name !== undefined ? { name } : {}),
           ...(title !== undefined ? { title } : {}),
@@ -50,12 +52,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       });
 
       if (Array.isArray(photoIds)) {
-        await tx.photoAlbum.deleteMany({ where: { albumId: params.id } });
+        await tx.photoAlbum.deleteMany({ where: { albumId: id } });
         if (photoIds.length > 0) {
           await tx.photoAlbum.createMany({
             data: (photoIds as string[]).map((photoId) => ({
               photoId,
-              albumId: params.id,
+              albumId: id,
             })),
           });
         }
@@ -72,11 +74,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    await prisma.album.delete({ where: { id: params.id } });
+    await prisma.album.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

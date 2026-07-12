@@ -7,33 +7,30 @@ import { getAlbum } from "@/shared/lib/queries";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  params: { id: string };
-  searchParams: { tag?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ tag?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const album = await getAlbum(params.id);
+  const { id } = await params;
+  const album = await getAlbum(id);
   return {
     title: `${album.title} — Filat Astakhov`,
     description: `${album.photos.length} photos · ${album.title}`,
     openGraph: {
-      images: [`/api/og?type=album&id=${params.id}`],
+      images: [`/api/og?type=album&id=${id}`],
     },
   };
 }
 
 export default async function AlbumPage({ params, searchParams }: Props) {
-  const album = await getAlbum(params.id);
-  const activeTag = searchParams.tag;
+  const { id } = await params;
+  const { tag: activeTag } = await searchParams;
+  const album = await getAlbum(id);
 
   // Collect all unique tags across photos in this album
-  const allTags = Array.from(
-    new Map(
-      album.photos
-        .flatMap((pa) => pa.photo.tags.map((pt) => pt.tag))
-        .map((tag) => [tag.id, tag])
-    ).values()
-  );
+  const flatTags = album.photos.flatMap((pa) => pa.photo.tags.map((pt) => pt.tag));
+  const allTags = Array.from(new Map(flatTags.map((tag) => [tag.id, tag])).values());
 
   // Filter photos by active tag (server-side)
   const filteredPhotos = activeTag
@@ -42,7 +39,7 @@ export default async function AlbumPage({ params, searchParams }: Props) {
       )
     : album.photos;
 
-  const context = `from=album&contextId=${params.id}`;
+  const context = `from=album&contextId=${id}`;
 
   return (
     <>
@@ -63,11 +60,11 @@ export default async function AlbumPage({ params, searchParams }: Props) {
       {allTags.length > 0 && (
         <div className="px-xl pb-xl flex gap-2 flex-wrap items-center max-md:px-md max-md:pb-lg" role="group" aria-label="Filter by tag">
           <span className="font-mono text-[0.58rem] font-bold uppercase tracking-[0.14em] text-muted mr-1">Filter</span>
-          <TagChip href={`/albums/${params.id}`} label="All" active={!activeTag} />
+          <TagChip href={`/albums/${id}`} label="All" active={!activeTag} />
           {allTags.map((tag) => (
             <TagChip
               key={tag.id}
-              href={`/albums/${params.id}?tag=${tag.id}`}
+              href={`/albums/${id}?tag=${tag.id}`}
               label={tag.title}
               active={activeTag === tag.id}
             />

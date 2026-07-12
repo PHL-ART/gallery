@@ -6,23 +6,25 @@ import { getTag } from "@/shared/lib/queries";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const tag = await getTag(params.id);
+  const { id } = await params;
+  const tag = await getTag(id);
   return {
     title: `#${tag.title} — Filat Astakhov`,
     description: `${tag.photos.length} photos tagged ${tag.title}`,
     openGraph: {
-      images: [`/api/og?type=tag&id=${params.id}`],
+      images: [`/api/og?type=tag&id=${id}`],
     },
   };
 }
 
 export default async function TagPage({ params }: Props) {
-  const tag = await getTag(params.id);
-  const context = `from=tag&contextId=${params.id}`;
+  const { id } = await params;
+  const tag = await getTag(id);
+  const context = `from=tag&contextId=${id}`;
 
   return (
     <>

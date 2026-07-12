@@ -4,13 +4,14 @@ import { authOptions } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
 interface Ctx {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(_req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   try {
     const tag = await prisma.tag.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: { select: { photos: true } },
         photos: {
@@ -28,6 +29,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
 }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -36,7 +38,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
     const result = await prisma.$transaction(async (tx) => {
       const tag = await tx.tag.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           ...(name !== undefined ? { name } : {}),
           ...(title !== undefined ? { title } : {}),
@@ -45,12 +47,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       });
 
       if (Array.isArray(photoIds)) {
-        await tx.photoTag.deleteMany({ where: { tagId: params.id } });
+        await tx.photoTag.deleteMany({ where: { tagId: id } });
         if (photoIds.length > 0) {
           await tx.photoTag.createMany({
             data: (photoIds as string[]).map((photoId) => ({
               photoId,
-              tagId: params.id,
+              tagId: id,
             })),
           });
         }
@@ -67,11 +69,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    await prisma.tag.delete({ where: { id: params.id } });
+    await prisma.tag.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

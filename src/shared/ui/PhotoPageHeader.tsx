@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ThemeToggle } from "@/shared/ui/ThemeToggle";
+import { LanguageSwitcher } from "@/shared/ui/LanguageSwitcher";
 
 interface PhotoPageHeaderProps {
   contextLabel?: string;
@@ -8,17 +12,18 @@ interface PhotoPageHeaderProps {
 }
 
 export function PhotoPageHeader({ contextLabel, contextHref, position }: PhotoPageHeaderProps) {
+  const t = useTranslations("nav");
+
   return (
     <header className="sticky top-0 z-50 bg-canvas transition-colors duration-[250ms] flex items-center justify-between px-xl h-[60px] max-md:px-md max-md:h-[52px] flex-shrink-0">
-      <Link
-        href="/"
-        className="font-mono font-bold text-[0.95rem] tracking-[-0.01em] text-primary no-underline focus-red"
-        aria-label="ph1l74 — home"
-      >
-        ph<span className="text-accent">1</span>l74
-      </Link>
+      <div className="flex items-center gap-xl max-md:gap-md">
+        <Link
+          href="/"
+          className="font-mono font-bold text-[0.66rem] uppercase tracking-[0.12em] text-muted hover-primary no-underline transition-colors duration-150 focus-red"
+        >
+          {t("home")}
+        </Link>
 
-      <div className="flex items-center gap-4">
         {contextLabel && (
           <div className="flex items-center gap-2 font-mono text-[0.66rem]">
             <Link
@@ -35,7 +40,12 @@ export function PhotoPageHeader({ contextLabel, contextHref, position }: PhotoPa
             )}
           </div>
         )}
+      </div>
+
+      <div className="flex items-center gap-md">
         <ThemeToggle />
+        <span className="text-accent font-bold" aria-hidden="true">·</span>
+        <LanguageSwitcher />
       </div>
     </header>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MotionPhotoGrid } from "@/shared/ui/MotionPhotoGrid";
+import { SectionHeading } from "@/shared/ui/SectionHeading";
 import { getPhotoUrl } from "@/shared/utils/getPhotoUrl";
 import { getPhotos } from "@/shared/lib/queries";
 
@@ -16,15 +17,7 @@ export default async function LatestPage() {
 
   return (
     <>
-      <div className="px-xl pt-[var(--space-3xl)] pb-[var(--space-2xl)] grid grid-cols-[1fr_auto] gap-[var(--space-2xl)] items-end max-md:grid-cols-1 max-md:px-md max-md:pt-[var(--space-2xl)] max-md:pb-xl max-md:gap-lg">
-        <h1 className="font-display font-black uppercase leading-[0.88] tracking-[-0.02em]" style={{ fontSize: "clamp(3rem, 8vw, 7rem)" }}>
-          Latest
-        </h1>
-        <div className="font-mono text-[0.72rem] text-muted text-right leading-[2] max-md:text-left">
-          <span className="block font-bold text-[0.58rem] uppercase tracking-[0.16em] text-accent mb-1">All photos</span>
-          {photos.length} photos
-        </div>
-      </div>
+      <SectionHeading section="latest" count={photos.length} />
 
       <MotionPhotoGrid
         photos={photos.map((p) => ({

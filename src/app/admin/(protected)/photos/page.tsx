@@ -67,7 +67,9 @@ export default async function AdminPhotosPage() {
                     alt=""
                     width={44}
                     height={44}
-                    className="object-cover"
+                    sizes="44px"
+                    loading="lazy"
+                    className="object-cover flex-shrink-0"
                     style={{ width: 44, height: 44 }}
                   />
                 </td>

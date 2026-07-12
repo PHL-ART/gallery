@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MotionPhotoGrid } from "@/shared/ui/MotionPhotoGrid";
+import { EntityMetaBadge } from "@/shared/ui/EntityMetaBadge";
 import { getPhotoUrl } from "@/shared/utils/getPhotoUrl";
 import { getTag } from "@/shared/lib/queries";
 
@@ -32,10 +33,7 @@ export default async function TagPage({ params }: Props) {
         <h1 className="font-display font-black uppercase leading-[0.88] tracking-[-0.02em]" style={{ fontSize: "clamp(3rem, 8vw, 7rem)" }}>
           {tag.title}
         </h1>
-        <div className="font-mono text-[0.72rem] text-muted text-right leading-[2] max-md:text-left">
-          <span className="block font-bold text-[0.58rem] uppercase tracking-[0.16em] text-accent mb-1">Tag</span>
-          {tag.photos.length} photos
-        </div>
+        <EntityMetaBadge type="tag" count={tag.photos.length} />
       </div>
 
       <MotionPhotoGrid

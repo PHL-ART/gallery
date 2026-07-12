@@ -28,6 +28,11 @@
     "specialCount": "{count, plural, one {# альбом} few {# альбома} many {# альбомов} other {# альбомов}}",
     "tagsCount": "{count, plural, one {# тег} few {# тега} many {# тегов} other {# тегов}}"
   },
+  "entity": {
+    "tagLabel": "Тег",
+    "specialLabel": "Избранное",
+    "photoCount": "{count, plural, one {# снимок} few {# снимка} many {# снимков} other {# снимков}}"
+  },
   "photo": {
     "sidebar": {
       "ariaLabel": "Детали фото",

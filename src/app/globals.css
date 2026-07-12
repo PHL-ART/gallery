@@ -20,9 +20,9 @@
   --red-dark:     oklch(0.32 0.18 25);
 
   /* Fonts */
-  --font-display: 'Barlow Condensed', sans-serif;
-  --font-body:    'Figtree', sans-serif;
-  --font-mono:    'Azeret Mono', monospace;
+  --font-display: 'Oswald', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 
   /* Spacing scale */
   --space-xs:  4px;

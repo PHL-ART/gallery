@@ -7,7 +7,12 @@ services:
     restart: "no"
 
   ph1l74-photo-app:
-    build: .
+    build:
+      context: .
+      args:
+        # Consumed by next.config.mjs to allowlist the S3 host for next/image.
+        # Needed at build time, so env_file below is too late for it.
+        S3_ENDPOINT: ${S3_ENDPOINT}
     restart: unless-stopped
     depends_on:
       ph1l74-photo-migrate:

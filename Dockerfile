@@ -14,7 +14,12 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
+# next.config.mjs allowlists this host for next/image at build time, so it has
+# to be available here — the runtime env_file is not read during the build.
+ARG S3_ENDPOINT
+ENV S3_ENDPOINT=$S3_ENDPOINT
 RUN mkdir -p public
+RUN test -n "$S3_ENDPOINT" || (echo "ERROR: S3_ENDPOINT build arg is empty — next/image would reject every S3 URL" && exit 1)
 RUN npm run build
 
 # ── Migrator (runs prisma migrate deploy at startup) ─────────────────────────

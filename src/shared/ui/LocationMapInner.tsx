@@ -30,12 +30,11 @@ export function LocationMapInner({ lat, lon, theme }: Props) {
       attributionControl: false,
     });
 
-    const tileUrl =
-      theme === "dark"
-        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
-
-    L.tileLayer(tileUrl, { maxZoom: 19, subdomains: "abcd" }).addTo(map);
+    // OSM serves a single light tile set — the dark variant is produced by the
+    // CSS filter below rather than by a separate tile URL.
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+    }).addTo(map);
 
     const icon = L.divIcon({
       html: `<div style="width:8px;height:8px;background:${RED_MARKER};outline:2px solid rgba(0,0,0,0.22)"></div>`,
@@ -55,7 +54,7 @@ export function LocationMapInner({ lat, lon, theme }: Props) {
 
   const filter =
     theme === "dark"
-      ? "brightness(0.8) contrast(1.1)"
+      ? "invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.95) saturate(0.7)"
       : "brightness(1.0) contrast(1.02)";
 
   return (
@@ -63,7 +62,7 @@ export function LocationMapInner({ lat, lon, theme }: Props) {
       <div
         ref={containerRef}
         style={{ height: 200, filter }}
-        className="w-full"
+        className={`w-full${theme === "dark" ? " map-dark-tiles" : ""}`}
       />
       <a
         href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}`}
@@ -72,7 +71,7 @@ export function LocationMapInner({ lat, lon, theme }: Props) {
         className="block font-mono text-[0.58rem] text-muted no-underline hover-primary transition-colors duration-150 mt-1 text-right"
         aria-label="Open location in OpenStreetMap"
       >
-        Open in OpenStreetMap ↗
+        © OpenStreetMap contributors ↗
       </a>
     </div>
   );

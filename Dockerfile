@@ -45,6 +45,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma/client ./nod
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/sharp ./node_modules/sharp
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@img ./node_modules/@img
 
+# The image cache is a named volume mounted at runtime. Docker seeds a fresh volume
+# from the image, so this directory must exist here and be owned by nextjs —
+# otherwise the volume is created root-owned and the optimizer cannot write to it.
+RUN mkdir -p /app/.next/cache/images && chown -R nextjs:nodejs /app/.next
+
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000

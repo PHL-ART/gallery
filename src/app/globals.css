@@ -101,3 +101,12 @@ body {
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border-color); }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── MAP TILES ───────────────────────────────────────────────────────────────── */
+/* OSM ships light tiles only, so the dark theme inverts the whole map container.
+   That inversion also hits the marker and zoom controls, so they are inverted
+   back here to restore their intended colours. */
+.map-dark-tiles .leaflet-marker-icon,
+.map-dark-tiles .leaflet-control-zoom {
+  filter: invert(1) hue-rotate(180deg);
+}

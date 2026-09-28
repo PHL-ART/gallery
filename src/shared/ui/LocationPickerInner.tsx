@@ -43,9 +43,10 @@ export function LocationPickerInner({ initial, onConfirm, onCancel }: Props) {
       attributionControl: false,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    // OSM serves a single light tile set — the dark look comes from the CSS
+    // filter on the map container rather than from a separate tile URL.
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      subdomains: "abcd",
     }).addTo(map);
 
     if (initial) {
@@ -100,8 +101,14 @@ export function LocationPickerInner({ initial, onConfirm, onCancel }: Props) {
     <div>
       <div
         ref={containerRef}
-        style={{ height: 280 }}
-        className="w-full"
+        style={{
+          height: 280,
+          // Dark-mode look for the light OSM tiles. The filter hits every child,
+          // so the marker is inverted back to its true colour in globals.css.
+          filter:
+            "invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.95) saturate(0.7)",
+        }}
+        className="w-full map-dark-tiles"
       />
       <div className="flex items-center justify-between mt-3">
         <span className="font-mono text-[0.6rem] text-muted">
